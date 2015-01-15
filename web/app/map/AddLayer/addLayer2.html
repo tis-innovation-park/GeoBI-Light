@@ -1,0 +1,31 @@
+<h2><span class="ngdialog-span-title">{{$root.text.map.box_aggiungistatistica1}}</span> {{$root.text.map.box_aggiungistatistica2}}</h2>
+<div ng-hide="ngDialogData.sheet.is_valid" class="alert alert-warning" role="alert">Acc acc la statistica non va bene!</div>
+<div class="form">
+    <div class="row">
+        <div class="col-sm-12 form-group" ng-show="ngDialogData.sheetData.length > 1">
+            <label class="control-label">{{$root.text.map.lab_foglio}}</label>
+            <select class="form-control" ng-model="ngDialogData.sheet" ng-options="sht.name for sht in ngDialogData.sheetData" ng-change="importTable.checkSheet()"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 form-group" ng-show="ngDialogData.spatialColumnData.length > 0">
+            <label class="control-label">{{$root.text.map.lab_colonnageometrica}}</label>
+            <select class="form-control col-geom-compiled" ng-model="ngDialogData.spatialColumn" ng-options="column.name for column in ngDialogData.spatialColumnData"></select>
+        </div>
+        <div class="col-sm-6 form-group" ng-show="ngDialogData.numericColumnData.length > 0">
+            <label class="control-label">{{$root.text.map.lab_colonnadati}}</label>
+            <select class="form-control col-dati-compiled" ng-model="ngDialogData.numericColumn" ng-options="column.name for column in ngDialogData.numericColumnData"></select>
+        </div>
+    </div>
+</div>
+
+<div class="table-custom">
+    <div class="table-col" ng-class="{'col-geom': ngDialogData.spatialColumn.column == h.code, 'col-dati': ngDialogData.numericColumn.column == h.code}" ng-repeat="h in importTable.data.header">
+        <header class="table-title-header">{{h.name}}</header>
+        <div ng-repeat="r in importTable.data.rows">{{r[$parent.$index]}}</div>
+    </div>
+</div>
+<div class="form-group text-right">
+    <button class="btn btn-default" ng-click="closeThisDialog({callback:'addLayerFromCkan'})">{{$root.text.map.but_indietro}}</button>
+    <button class="btn btn-default" ng-disabled="!ngDialogData.sheet.is_valid" ng-click="closeThisDialog({callback:'getCkanLayer', data: ngDialogData})">{{$root.text.map.but_fatto}}</button>
+</div>

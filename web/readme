@@ -1,0 +1,25 @@
+app
+  about
+    about.html
+    about.js
+    about.spec.js
+  home
+    home.html
+    home.js
+    home.spec.js
+  app.js
+  app.spec.js
+assets
+  (images etc.)
+common
+  directives
+  resources (or models)
+  services
+styles
+  (sass/less/css files)
+index.html
+
+
+bower
+
+bower install angular#1.2.26

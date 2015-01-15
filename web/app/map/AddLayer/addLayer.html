@@ -1,0 +1,17 @@
+<h2><span class="ngdialog-span-title">{{$root.text.map.box_aggiungistatistica1}}</span> {{$root.text.map.box_aggiungistatistica2}}</h2>
+<div class="form">
+    <div class="form-group">
+        <label>Package</label>
+        <select class="form-control" ng-model="addLayer.ckanPackage" ng-options="pkg.name for pkg in addLayer.ckanData" ng-change="addLayer.checkCkanPackage()"></select>
+        <p class="help-block">{{addLayer.ckanPackage.description}}</p>
+    </div>
+    
+    <div class="form-group" ng-show="addLayer.ckanPackage.resources.length > 1">
+        <label>ID</label>
+        <select class="form-control" ng-model="addLayer.ckanId" ng-options="obj.name for obj in addLayer.ckanPackage.resources" ></select>
+        <p class="help-block">{{addLayer.ckanId.description}}</p>
+    </div>
+    <div class="form-group text-right">
+        <button class="btn btn-default" ng-click="closeThisDialog({callback: 'getCkanDataset', data: addLayer})">{{$root.text.map.but_importa}}</button>
+    </div>
+</div>

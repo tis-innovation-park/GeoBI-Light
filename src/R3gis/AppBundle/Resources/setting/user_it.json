@@ -1,0 +1,17 @@
+{
+    "user": {
+        "roles": {
+            "options": [
+                { "key": "ADMIN", "value": "IT: Amministratore" },
+                { "key": "MAP_PRODUCER", "value": "IT: map Producer" }
+            ]
+        },
+        "status": {
+            "options": [
+                { "key": "W", "value": "IT: Waiting for Validation" },
+                { "key": "E", "value": "IT: Enabled" },
+                { "key": "D", "value": "IT: Disabled" }
+            ]
+        }
+    }
+}

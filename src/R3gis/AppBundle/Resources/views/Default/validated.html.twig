@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="it">   <!-- lang passato da app -->
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <p>
+            {% if success %}
+                The account has been successfully validated!<br>
+            {% else %}
+                The account could not be validated, there was an error: {{error}}<br>
+            {% endif %}
+            You will be redirected to our homepage in 3 seconds, or you can click <a href="">here</a>.
+        </p>
+        <script>
+            
+            function init() {
+                setTimeout(function(){
+                    location.href="/";
+                },3000);
+            }
+            window.onload=init();
+        </script>
+    </body>
+</html>

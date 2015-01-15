@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-xs-11">
+        <div class="form-group input-group">
+            <input class="form-control form-search" type="text" ng-model="duplicateMap.filters.q" ng-change="duplicateMap.search()" placeholder="{{$root.text.homepage.search}}">
+            <span class="input-group-btn">
+                <button class="btn btn-search" type="submit"><i class="fa fa-search"></i></button>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="row row-list" ng-repeat="map in duplicateMap.data" ng-click="duplicateMap.duplicate(map.hash)">
+    <div class="form-group">
+        <div class="col-xs-3">   
+            <img ng-src="{{ngDialogData.baseUrl}}map/stat/{{map.hash}}/100/78/preview.png" class="img-responsive preview-duplicate-map">
+        </div>
+        <div class="col-xs-9">
+            <h2>{{map.name}}</h2>
+            <p>{{map.description}}</p>
+            <div class="col-xs-6 col-no-padding field-duplicate-map">{{map.user.name}}</div>
+            <div class="col-xs-6 col-no-padding field-duplicate-map"><time datetime="{{map.modDate}}">{{map.modDate | date: 'HH:mm dd/MM/yyyy' }}</time></div>
+        </div>
+    </div>
+</div>
+<div class="text-center btns-duplicate-map-dialog">
+    <button class="btn btn-default" ng-hide="duplicateMap.paginations.offset == 0" ng-click="duplicateMap.previous()"><i class="fa fa-arrow-left fa-lg"></i></button>
+    <button class="btn btn-default" ng-hide="duplicateMap.areAllMapsLoading()" ng-click="duplicateMap.next()"><i class="fa fa-arrow-right fa-lg"></i></button>
+</div>

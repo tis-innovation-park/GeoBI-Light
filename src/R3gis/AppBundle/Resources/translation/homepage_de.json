@@ -1,0 +1,22 @@
+{
+    "title": "GeoBi",
+    "search": "Suche",
+	"but_tutte": "Alle",
+	"but_lemiemappe": "Meine Karten",
+	"but_creamappa1": "Neue",
+	"but_creamappa2": "Karte",
+	"box_linguamappa": "Kartensprache",
+	"but_carica": "Laden",
+	"but_nuova": "Neu",
+	"lab_autore": "Autor",
+	"but_caricaaltre": "Weitere laden",
+	"lab_cancellaremappa1": "Karte",
+	"lab_cancellaremappa2": "löschen",
+	"lab_seisicurocancellare": "Bist du sicher dass du diese Karte löschen möchtest?",
+	"but_annulla": "Abbrechen",
+	"but_conferma": "Ja",
+	"lab_copiamappa1": "Karte",
+	"lab_copiamappa2": "kopieren",
+	"but_fatto": "OK",
+	"tip_visualizza": "Anzeigen"
+}

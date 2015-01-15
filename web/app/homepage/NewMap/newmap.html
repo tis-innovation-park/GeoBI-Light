@@ -1,0 +1,12 @@
+<h2><span class="ngdialog-span-title">{{$root.text.homepage.but_creamappa1}}</span> {{$root.text.homepage.but_creamappa2}}</h2>
+<div class="form">
+    <div class="form-group">
+        <label>{{$root.text.homepage.box_linguamappa}}</label>
+        <select class="form-control" ng-model="newmap.lang" ng-options="sign as lang for (sign, lang) in newmap.languages">
+        </select>
+    </div>
+    <div class="form-group text-right">
+        <button class="btn btn-default" ng-click="newmap.selectCopyMap()">{{$root.text.homepage.but_carica}}</button>
+        <button class="btn btn-default" ng-click="newmap.openNewMap()">{{$root.text.homepage.but_nuova}}</button>
+    </div>
+</div>

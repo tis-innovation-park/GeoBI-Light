@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html ng-app="geobi" lang="it">   <!-- lang passato da app -->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/ng-dialog/0.3.2/css/ngDialog.min.css">
+        <link rel="shortcut icon" href="app/styles/img/favicon.ico" />
+
+
+        <!-- JS -->
+        <script src="//www.openlayers.org/api/OpenLayers.js"></script>
+        <script type="text/javascript" src="vendor/angular.min.js"></script>
+        <script type="text/javascript" src="vendor/angular-ui-router.min.js"></script>
+        <script type="text/javascript" src="app/styles/js/bootstrap-colorpicker-module.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ng-dialog/0.3.2/js/ngDialog.min.js"></script>
+        <script type="text/javascript" src="app/app.js"></script>
+        
+        <!-- If IE -->
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+        <![endif]-->
+        <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <![endif]-->
+        
+        <!-- Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="app/styles/css/font-awesome.min.css" type="text/css" />
+        
+        <!-- Style -->
+        <link rel="styleSheet" href ="app/styles/css/reset.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/bootstrap.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/geobi.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/colorpicker.css" type="text/css" />
+    </head>
+    <body ng-controller="AppController as app">
+        <header>
+            <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-menu-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="go-back-mobile" ui-sref="homepage" ui-sref-active="hide" title="Ritorna alle mappe"><i class="fa fa-angle-left fa-3x" ></i></a>
+                        <a href="http://geobi.info/" title="Vai al sito GeoBI"><img src="app/styles/img/logo_GeoBI_white.png" class="img-responsive logo-geobi-mobile" /></a>
+                    </div>
+                    
+                    <div class="collapse navbar-collapse" id="header-menu-collapse">
+                        <ul class="nav navbar-nav navbar-right border-nav">
+                            <li><a href="http://geobi.info">{% verbatim %}{{$root.text.app.mnu_progetto}}{% endverbatim %}</a></li>
+                            <li><a href="http://geobi.info/help">{% verbatim %}{{$root.text.app.mnu_tutorial}}{% endverbatim %}</a></li>
+                            <li><a href="http://geobi.info/terms">{% verbatim %}{{$root.text.app.mnu_termini}}{% endverbatim %}</a></li>
+<!--                            <li><a href="#">{% verbatim %}{{$root.text.app.mnu_area}}{% endverbatim %}</a></li>-->
+                            <li><a ui-sref="signup" ng-hide="app.isAuth()">Registrati</a></li>
+                            <li><a ui-sref="user" ng-show="app.isAdmin()">Utenti</a></li>
+                            <li><p class="navbar-text" ng-show="app.isAuth()">{% verbatim %}{{app.user.name}}{% endverbatim %}</p></li>
+                            <li class="toggle-hover-lang"><a href="#" class="dropdown-toggle">{% verbatim %}{{app.currentLang | uppercase}}{% endverbatim %}</a>
+                                <ul class="toggle-lang">
+                                    <li ng-click="app.setLang('it')">IT</li>
+                                    <li ng-click="app.setLang('de')">DE</li>
+                                    <li ng-click="app.setLang('en')">EN</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="row text-right logo-header">
+                <!-- <div class="col-xs-1">
+                    
+                </div> -->
+                <div class="col-xs-12">
+                    <a class="go-back" ui-sref="homepage" ui-sref-active="hide" title="{% verbatim %}{{$root.text.map.tip_tornaallemappe}}{% endverbatim %}"><i class="fa fa-angle-left fa-2x" ></i></a>
+                    <a href="http://geobi.info/" title="Vai al sito GeoBI"><img src="app/styles/img/logo_GeoBI.png" class="img-responsive logo-geobi" /></a>
+                </div>
+            </div>
+        </header>
+        <div class="btn-login"><button class="btn btn-default" ui-sref="login" ui-sref-active="hide" ng-hide="app.isAuth()">Login</button></div>
+        <div class="btn-login"><button class="btn btn-default" ui-sref="logout" ng-show="app.isAuth()">Logout</button></div>
+        <div ui-view>
+        </div>
+        <footer class="footer-geobi">
+            <div class="col-md-8 col-sm-7 col-xs-6">
+                <p>Geobi.info geographic business intelligence | TIS innovation park | Siemensstr.19 - 39100 Bozen</p>
+                <p><a href="mailto:info@geobi.info">info@geobi.info</a> | <a href="tel:+390471068000">+39 0471 068000</a> | MwSt.Nr. IT 01677580217</p>
+                <p>Impressum & Privacy | Forum & FAQs</p>
+            </div>
+            <div class="col-md-4 col-sm-5 col-xs-6 text-right">
+                <ul class="footer-logos">
+                    <li class="ue">
+                        <a href="http://www.provinz.bz.it/europa/" alt="Unione Europea - Provincia Autonoma di Bolzano - Alto Adige" target="_blank">Unione Europea - Provincia Autonoma di Bolzano - Alto Adige</a>
+                    </li>
+                    <li class="pab">
+                        <a href="http://www.provinz.bz.it/" alt="Provincia Autonoma di Bolzano Alto Adige - Autonome Provinz Bozen Sudtirol" target="_blank">Provincia Autonoma di Bolzano Alto Adige - Autonome Provinz Bozen Sudtirol</a>
+                    </li>
+                    <li class="tis">
+                        <a href="http://www.tis.bz.it/" alt="TIS - Innovation Park" target="_blank">TIS - Innovation Park</a>
+                    </li>
+                </ul>
+            </div>
+        </footer>
+        <script type="text/javascript" src="app/styles/js/bootstrap-without-jquery.js"></script>
+    </body>
+</html>

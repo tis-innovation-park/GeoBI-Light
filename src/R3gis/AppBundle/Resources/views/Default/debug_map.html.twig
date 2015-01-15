@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="it">   <!-- lang passato da app -->
+    <head>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script src="//code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
+        <script src="//www.openlayers.org/api/OpenLayers.js"></script>
+        <style>
+            body {
+                font-family: "Trebuchet MS", "Helvetica", "Arial",  "Verdana", "sans-serif";
+                font-size: 62.5%;
+            }
+
+            .ui-dialog { z-index: 100000 !important ;}
+        </style>
+
+        <script type="text/javascript">
+
+            var urlPrefix = '../../api/1/map/';
+            var maxExtent = [737779, 4231225, 2061823, 5957355];
+            var originalHash = '{{ hash }}';
+            var currentHash = '{{ hash }}';
+            var hashList = [];
+
+            var map;  // OL map
+            var mapDef;  // GeoBI map def
+            var baseLayer = {};
+            var importDataResult;
+            var dialog;
+            
+            var identifyTimer;
+
+            function showError(element, data) {
+                console.log(data);
+                if (data.success) {
+                } else {
+                    if (data.error) {
+                        $(element).val(data.error);
+                    } else {
+                        $(element).val(data);
+                    }
+                }
+            }
+
+            function getImportList() {
+                importDataResult = null;
+                $('#import_sheet,#import_geo_col,#import_num_col').empty();
+                $.getJSON(urlPrefix + "../ckan/packages.json", function (data) {
+                    if (data.success) {
+                        $select = $('#import_1');
+                        $select.append('<option value="">-- Selezionare --</option>');
+                        $.each(data.result, function (dummy, mainData) {
+                            var mainTitle = mainData.name;
+                            $.each(mainData.resources, function (dummy, data) {
+                                var id = mainData.id + '|' + data.id;
+                                var title = mainTitle + ' - ' + data.name + ' (' + data.format + ')';
+                                $select.append('<option value="' + id + '">' + title + '</option>');
+                            });
+                        });
+                    } else {
+                        showError('#log', data);
+                    }
+                });
+            }
+
+            function fillImportColumns() {
+                var val = $('#import_sheet').val();
+
+                $('#import_geo_col,#import_num_col').empty();
+
+                $geoSelect = $('#import_geo_col');
+                $numSelect = $('#import_num_col');
+
+                $.each(importDataResult, function (dummy, mainData) {
+                    if (mainData.code == val) {
+                        $('#btnImport2').prop('disabled', !mainData.is_valid);
+                        if (mainData.is_shape) {
+                            $geoSelect.append('<option value="">[SHAPE]</option>');
+                            $numSelect.append('<option value="">[NESSUNA]</option>');
+                        }
+                        $.each(mainData.headers, function (dummy, header) {
+                            if (header.spatial_data) {
+                                $geoSelect.append('<option value="' + header.column + '">' + header.name + '</option>');
+                            }
+                            if (header.numeric_data) {
+                                $numSelect.append('<option value="' + header.column + '">' + header.name + '</option>');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function doImport() {
+                importDataResult = null;
+                $('#import_sheet,#import_geo_col,#import_num_col').empty();
+                $("#import_log").val('');
+                var k = $('#import_1').val().split('|');
+
+                var opt = {
+                    package: k[0],
+                    id: k[1]
+                };
+                $.ajax({
+                    url: urlPrefix + '../ckan/' + k[0] + '/' + k[1] + '/tables.json',
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            importDataResult = data.result;
+                            $select = $('#import_sheet');
+                            // Populate sheet
+                            $.each(data.result, function (dummy, mainData) {
+                                $select.append('<option value="' + mainData.code + '">' + mainData.name + '</option>');
+                            });
+                            fillImportColumns();
+                        } else {
+                            showError('#log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                    }
+                });
+            }
+
+
+            function init() {
+
+                map = new OpenLayers.Map("map", {
+                    controls: [
+                        new OpenLayers.Control.PanZoomBar(),
+                        new OpenLayers.Control.LayerSwitcher({'ascending': false}),
+                        new OpenLayers.Control.Permalink('permalink'),
+                        new OpenLayers.Control.MousePosition(),
+                        new OpenLayers.Control.OverviewMap(),
+                        new OpenLayers.Control.KeyboardDefaults(),
+                        new OpenLayers.Control.Navigation(), // {mouseWheelOptions: {interval: 10, cumulative: true }} ),
+                        new OpenLayers.Control.ScaleLine(),
+                        new OpenLayers.Control.Attribution()
+                    ],
+                    projection: new OpenLayers.Projection("EPSG:3857")
+                            // displayProjection: new OpenLayers.Projection("EPSG:3857")
+                });
+
+                baseLayer['osm'] = new OpenLayers.Layer.OSM("OpenStreetMap");
+                baseLayer['none'] = new OpenLayers.Layer("Empty layer", {isBaseLayer: true});
+                map.addLayers([baseLayer['osm'], baseLayer['none']]);
+
+                /*map.events.register("mousemove", map, function(e) {      
+                    var position = e.map.getLonLatFromViewPortPx(e.xy);
+                    //var position = e.map.x + e.xy.y;
+                    document.title = position;
+                    //OpenLayers.Util.getElement("tooltip").innerHTML = position 
+                    
+                });*/
+        map.events.register("mousemove", map, function (e) {
+            identifyLater(e.xy, 250);
+        });
+
+
+
+
+
+
+                // Add stat1
+                //var wmsBaseUrl = '../../map/stat/{{ hash }}/stat/1/';
+                //var wmsBaseUrl = 'http://geobi.r3-gis/map/stat/{{ hash }}/stat/1/';
+                //var layer = new OpenLayers.Layer.WMS('Stats 1base', wmsBaseUrl, {layers: 'stat', format: 'image/png; mode=8bit'}, {singleTile: true, isBaseLayer: false, noMagic: true, opacity: 1, visibility: true});
+                //self.layer.events.register('loadstart', self, self.loadStart);
+                //self.layer.events.register('loadend', self, self.loadEnd);
+
+                // layer.setName('cio');
+                //map.addLayer(layer);
+
+
+
+
+
+
+
+
+
+                //map.zoomToExtent(extent);
+                /*
+                 // add stat 1
+                 var dm_wms = new OpenLayers.Layer.WMS("Canadian Data",
+                 "http://www2.dmsolutions.ca/cgi-bin/mswms_gmap",
+                 {
+                 layers: "bathymetry,land_fn,park,drain_fn,drainage," +
+                 "prov_bound,fedlimit,rail,road,popplace",
+                 transparent: "true",
+                 format: "image/png"
+                 },
+                 {isBaseLayer: false}
+                 );
+                 map.addLayer(dm_wms);*/
+
+                /*var tilesExtent = new OpenLayers.Bounds(1030000, 5800000, 1930000, 6330000);
+                 var basemap = new OpenLayers.Layer.WMTS({
+                 name: "basemap.at",
+                 url: 
+                 "http://maps.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpeg",
+                 layer: "geolandbasemap",
+                 matrixSet: "google3857",
+                 requestEncoding: "REST",
+                 style: "normal",
+                 tileFullExtent:tilesExtent,
+                 isBaseLayer: false
+                 });
+                 map.addLayer(basemap);*/
+
+
+                //map.setCenter(new OpenLayers.LonLat(lon, lat), zoom);
+                //map.addControl( new OpenLayers.Control.LayerSwitcher() );
+
+
+
+
+                /*var lonLat = new OpenLayers.LonLat(lon, lat)
+                 .transform(
+                 new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                 map.getProjectionObject() // to Spherical Mercator Projection
+                 );
+                 
+                 map.setCenter(lonLat, zoom);*/
+
+//        zoomToExtent: function(	bounds,
+//closest	)
+
+
+
+
+            }
+
+
+
+
+
+/*
+ * 
+ * _handleSelection: function(geom) {
+			var self = gisclient.toolObjects.easySelectFromMap;
+
+			gisclient.componentObjects.loadingHandler.show();
+			
+			// check the geometry drown by the user and assign a filter type and value
+			if(geom.CLASS_NAME == 'OpenLayers.Bounds') {
+				var type = OpenLayers.Filter.Spatial.BBOX;
+				var lb = gisclient.map.getLonLatFromPixel(new OpenLayers.Pixel(geom.left, geom.bottom)); 
+				var rt = gisclient.map.getLonLatFromPixel(new OpenLayers.Pixel(geom.right, geom.top));
+				var value = new OpenLayers.Bounds(lb.lon, lb.lat, rt.lon, rt.lat);
+				self.options.selectionExtent = value;
+			} else if(geom.CLASS_NAME == 'OpenLayers.Pixel') {
+				var lonLat = gisclient.map.getLonLatFromPixel(geom);
+				var point = new OpenLayers.Geometry.Point(lonLat.lon, lonLat.lat);
+				var value = OpenLayers.Geometry.Polygon.createRegularPolygon(point, self.options.pointSelectionDefaultTolerance, 30, 90);
+				var type = OpenLayers.Filter.Spatial.INTERSECTS;
+				self.options.selectionExtent = value.getBounds();
+			}
+			
+			// create the openlayers spatial filter
+			var filter = new OpenLayers.Filter.Spatial({
+				type: type,
+				value: value,
+				projection: gisclient.getProjection(),
+				property: 'the_geom'
+			});
+
+			queryLayers = gisclient.componentObjects.gcLayersManager.getQueryableLayers(true);
+			
+			// start the query
+			self._query(queryLayers, filter);
+		},
+		
+		_handleFeatureClick: function() {
+			var self = gisclient.toolObjects.easySelectFromMap;
+			
+			var mpControl = gisclient.map.getControlsByClass('OpenLayers.Control.MousePosition');
+			self._handleSelection(mpControl[0].lastXy);
+		},
+ */
+            function identifyLater(xy, time) {
+                if (identifyTimer) {
+                    clearTimeout(identifyTimer);
+                }
+                var statNo = 1;
+                identifyTimer = setTimeout(function() {
+                    position = map.getLonLatFromViewPortPx(xy);
+                    var extent = map.getExtent();
+                    var mapWidth = Math.abs(extent.right-extent.left);
+                    var mapWidthPx = $('#map').width();
+                    
+                    var prefix = '#layer_' + statNo + '>';
+                    var pointSizePx = Math.max(4, parseInt($(prefix + '[data-element=maxSize]').val()) - 2);
+                    
+                    var divisor = Math.max(1, Math.floor(mapWidthPx/pointSizePx));
+                    //console.log(pointSizePx, mapWidthPx, divisor);
+                    
+                    buffer = Math.round(mapWidth / divisor);
+                    // console.log(buffer);
+                    
+                    $.ajax({
+                    url: urlPrefix + '../map/' + currentHash + '/stat/' + statNo + '/info.json?x=' + position.lon + '&y='+position.lat + '&buffer='+buffer ,
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            $('#log').val();
+                            var html = '';
+                            var id = null;
+                            $.each(data.result, function(dummy, row) {
+                                if (id === null) {
+                                    id = row.id;
+                                }
+                                html += 'ID: ' + row.id + '\n';
+                                html += 'Name: ' + row.name + '\n';
+                                html += 'Data: ' + row.data + '\n';
+                                html += '----------\n';
+                            });
+                            $('#log').val(html);
+                            setIdentify(currentHash, statNo, id);
+                        } else {
+                            showError('#log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                    }
+                });
+                
+                }, time);
+            }
+            
+            function setBackgroundType(type) {
+
+                map.setBaseLayer(baseLayer[type]);
+            }
+
+            function removeAllStatLayers() {
+                var i = 0;
+                identifyLayer = null;
+                lastIdentifyId = null;
+                while (i < map.getNumLayers()) {
+                    var layer = map.layers[i];
+                    if (!layer.isBaseLayer) {
+                        map.removeLayer(layer);
+                    } else {
+                         i++;
+                    }
+                }
+            }
+
+            var globalLayer;
+            function addStatLayer(hash, order) {
+                // edit only: add time
+                var t = new Date().getTime();
+                var wmsBaseUrl = 'http://geobi.r3-gis/map/stat/' + hash + '/stat/' + order;
+                var layer = new OpenLayers.Layer.WMS('Stats Layer ' + order, wmsBaseUrl, {t: t, layers: 'stat', format: 'image/png; mode=8bit'}, {singleTile: true, isBaseLayer: false, noMagic: true, opacity: 1, visibility: true});
+                layer.events.register('loadstart', layer, function () {
+                    $('#event').val('Loading');
+                });
+                layer.events.register('loadend', layer, function () {
+                    $('#event').val('');
+                });
+
+                map.addLayer(layer);
+                // layer.redraw( true );
+            }
+            
+            function setIdentify(hash, order, id) {
+                if (lastIdentifyId == id) {
+                    return;
+                }
+                lastIdentifyId = id;
+                if (id == null ) {
+                    map.removeLayer(identifyLayer);
+                    identifyLayer = null;
+                    return;
+                }
+                //identifyLayer.setVisibility( id != null );
+                
+                if (!identifyLayer) {
+                    var t = new Date().getTime();
+                    var wmsBaseUrl = 'http://geobi.r3-gis/map/stat/' + hash + '/stat/' + order;
+                    var layer = new OpenLayers.Layer.WMS('Identify Layer ' + order, wmsBaseUrl, {t: t, highlight: id, layers: 'stat', format: 'image/png; mode=8bit'}, {singleTile: true, isBaseLayer: false, noMagic: true, opacity: 1, visibility: true});
+                    map.addLayer(layer);
+                    identifyLayer = layer;
+                } else {
+                    identifyLayer.mergeNewParams({highlight: id});
+                    identifyLayer.redraw( true );
+                }
+                
+            }
+            
+
+            function populateLayerData(layerNr, layer) {
+                //$('#layer_2>[data-element=name]')
+                var prefix = '#layer_' + layerNr + '>';
+                $(prefix + '[data-element=name]').val(layer.name);
+                $(prefix + '[data-element=type]').val(layer.options.layer_type);
+                $(prefix + '[data-element=division]').val(layer.options.division_type);
+                $(prefix + '[data-element=nodata_color]').val(layer.options.nodata_color);
+                $(prefix + '[data-element=outline_color]').val(layer.options.outline_color);
+                $(prefix + '[data-element=opacity]').val(layer.options.opacity);
+                $(prefix + '[data-element=precision]').val(layer.options.precision);
+                $(prefix + '[data-element=unit]').val(layer.options.unit);
+                $(prefix + '[data-element=minSize]').val(layer.options.minSize);
+                $(prefix + '[data-element=maxSize]').val(layer.options.maxSize);
+                $(prefix + '[data-element=sizeType]').val(layer.options.sizeType);
+                $(prefix + '[data-element=symbol]').val(layer.options.symbol);
+
+                if (layer.options.class) {
+                    $(prefix + '[data-element=class_no]').val(layer.options.class.length);
+                    var classNo = 0;
+                    $.each(layer.options.class, function (dummy, c) {
+                        classNo++;
+                        $(prefix + '[data-element=class_' + classNo + '_number]').val(c.number);
+                        $(prefix + '[data-element=class_' + classNo + '_color]').val(c.color);
+                    });
+                }
+
+            }
+
+            function doApplyImport() {
+                $("#import_log_2").val('');
+                var k = $('#import_1').val().split('|');
+                var table = $('#import_sheet').val();
+                if (table == '' || table == 'null' || table == null) {
+                    table = '';
+                }
+                
+                $('#event').val('Apply import...');
+                
+                var opt = {
+                    spatial_column: $("#import_geo_col").val(),
+                    data_column: $("#import_num_col").val(),
+                    hash: currentHash,
+                    duplicate: true
+                };
+                $.ajax({
+                    url: urlPrefix + '../import/ckan/' + k[0] + '/' + k[1] + '/' + table,
+                    type: 'POST',
+                    //type: 'GET', // SS: temporaneo
+                    dataType: 'json',
+                    //contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            dialog.dialog("close");
+                            initMap2(data.result.hash, data.result.map);
+                            $('#event').val('');
+                        } else {
+                            showError('#log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                    }
+                });
+            }
+            
+            function doApplyRemoveLayer(hash, id) {
+
+                $('#event').val('Removing layer...');
+                var opt = {
+                    hash: hash,
+                    layer: id,
+                    duplicate: true
+                };
+                $.ajax({
+                    url: urlPrefix + '../import/remove_layer.json',
+                    //type: 'POST',
+                    type: 'GET', // SS: temporaneo
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            initMap2(data.result.hash, data.result.map);
+                            $('#event').val('');
+                        } else {
+                            showError('#log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                    }
+                });
+            }
+            
+            function getClassDef(layerNr, classNr) {
+                var prefix = '#layer_' + layerNr + '>';
+                var layer = {
+                    order: classNr,
+                    number:  $(prefix + '[data-element=class_' + classNr + '_number]').val(),
+                    color:  $(prefix + '[data-element=class_' + classNr + '_color]').val()
+                };
+                return layer;
+            }
+            
+            function getLayerDef(layerNr) {
+                var prefix = '#layer_' + layerNr + '>';
+                var classes = [];
+                for (var i = 1; i <= 4; i++) {
+                    var c = getClassDef( layerNr, i );
+                    if (c.number != '') {
+                        classes.push( c ) ;
+                    }    
+                }
+                
+                var layer = {
+                    name:  $(prefix + '[data-element=name]').val(),
+                    order: layerNr,
+                    division_type: $(prefix + '[data-element=division]').val(),
+                    divisions: $(prefix + '[data-element=class_no]').val(),
+                    layer_type: $(prefix + '[data-element=type]').val(),
+                    nodata_color: $(prefix + '[data-element=nodata_color]').val(),
+                    outline_color: $(prefix + '[data-element=outline_color]').val(),
+                    opacity: $(prefix + '[data-element=opacity]').val(),
+                    precision: $(prefix + '[data-element=precision]').val(),
+                    unit: $(prefix + '[data-element=unit]').val(),
+                    minSize: $(prefix + '[data-element=minSize]').val(),
+                    maxSize: $(prefix + '[data-element=maxSize]').val(),
+                    sizeType: $(prefix + '[data-element=sizeType]').val(),
+                    symbol: $(prefix + '[data-element=symbol]').val(),
+                    class: classes
+                };
+                return layer;
+            }
+            
+            function applyChanges(permanent) {
+                $('#event').val('Saving...');
+                var layers = [];
+                for (var i = 1; i <= 4; i++) {
+                    var l = getLayerDef( i );
+                    if (l.name != '') {
+                        layers.push( l ) ;
+                    }    
+                }
+                
+                var opt = {
+                    duplicate: !permanent,
+                    purge: permanent,
+                    map: {
+                        title: $('#title').val(),
+                        description: $('#description').val(),
+                        backgroundType: $('#background-type').val(),
+                        private: $('#private').val(),
+                        layers: layers
+                    }
+                };
+                
+                // SS: send as json!!!
+                $.ajax({
+                    url: urlPrefix + '../map/' + currentHash + '/save.json',
+                    //type: 'POST',
+                    type: 'POST', 
+                    //dataType: 'json',
+                    //contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            initMap2(data.result.hash, data.result.map);
+                            $('#event').val('');
+                        } else {
+                            showError('#log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                    }
+                });
+            }
+
+
+            // Called from init and add/remove layer
+            function initMap2(hash, mapInfo) {
+                
+                if (identifyTimer) {
+                    clearTimeout(identifyTimer);
+                }    
+                currentHash = hash;
+                hashList.push(currentHash);
+                mapDef = mapInfo;
+                
+                $('#hash').val(currentHash);
+
+                // Dati generali statistica
+                $('#title').val(mapInfo.name);
+                $('#description').val(mapInfo.description);
+                $('#private').val(mapInfo.private.toString());
+
+                // Dati generali sfondo
+                $('#background-type').val(mapInfo.backgroundType);
+                setBackgroundType(mapInfo.backgroundType);
+
+                // Dati layer
+                removeAllStatLayers();
+                $.each(mapInfo.layers, function (dummy, layer) {
+                    if (layer.type == 'statistic') {
+                        var layerNr = layer.order;
+                        populateLayerData(layerNr, layer);
+                        addStatLayer(hash, layerNr);
+                    }    
+                });
+
+                map.zoomToExtent(new OpenLayers.Bounds(mapInfo.extent[0], mapInfo.extent[1], mapInfo.extent[2], mapInfo.extent[3]));
+
+            }
+
+
+
+
+            function print() {
+                $('#print').prop('disabled', true);
+                $("#download").hide();
+                var tiles = [];
+			
+                $.each(map.layers, function(layername, layer) {
+                    if (!layer.getVisibility()) return;
+                    //if (!layer.calculateInRange()) return;
+                    var tile;
+                    if(layer.CLASS_NAME == 'OpenLayers.Layer.TMS') {
+                        tile = {
+                            url: layer.url.replace('/tms/', '/wms/'),
+                            service: 'TMS',
+                            parameters: {
+                                service: 'WMS',
+                                request: 'GetMap',
+                                project: gisclient.getProject(),
+                                map: gisclient.getMapOptions().mapsetName,
+                                layers: [layer.layername.substr(0, layer.layername.indexOf('@'))],
+                                version: '1.1.1',
+                                format: 'image/png'
+                            },
+                            opacity: layer.opacity ? (layer.opacity * 100) : 100
+                        };
+                    } else if(layer.CLASS_NAME == 'OpenLayers.Layer.WMS') {
+                        tile = {
+                            url: layer.url,
+                            service: 'WMS',
+                            parameters: layer.params,
+                            opacity: layer.opacity ? (layer.opacity * 100) : 100
+                        };
+                    } else if(layer.CLASS_NAME == 'OpenLayers.Layer.WMTS') {
+                        tile = {
+                            url: layer.url,
+                            service: 'WMTS',
+                            project: layer.projectName,
+                            layer: layer.layerName,
+                            parameters: layer.params,
+                            opacity: layer.opacity ? (layer.opacity * 100) : 100
+                        };
+                    }
+                    if(tile) {
+                        tiles.push(tile);
+                    }
+                });
+
+                printServiceUrl = 'http://geobi.r3-gis/author/services/print.php';
+                var viewportSize = {width: $('#map').width(), height: $('#map').height()};
+                var center = map.getCenter();
+                var extent = map.calculateBounds().toBBOX();
+                var params = {
+                    viewport_size: [viewportSize.width, viewportSize.height],
+                    center: [center.lon, center.lat],
+                    format: 'PDF',
+                    printFormat: 'A4',
+                    direction: 'vertical',
+                    scale_mode: 'auto',
+                    text: 'Test 01',
+                    extent: extent,
+                    date: '01/02/2013',
+                    dpi: 150,
+                    srid: 'EPSG:3857',
+                    lang: 'it',
+                    northArrow:null,
+                    copyrightString: 'GeoBi',
+                    logoSx: null,
+                    logoDx: null,
+                    tiles: tiles
+                }    
+                        
+                $.ajax({
+                    url: printServiceUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: params,
+                    success: function(response) {
+                        if (response.result='ok') {
+                            $("#download").attr("href", response.file).show();
+                        }    
+                        showError('#log', response);
+                        $('#print').prop('disabled', false);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#log', errorThrown);
+                        $('#print').prop('disabled', false);
+                    }
+                });
+            }
+            
+            function initMap(hash) {
+                $('#log').html('');
+                $.getJSON(urlPrefix + hash + "/map.json", function (data) {
+                    if (data.success) {
+                        $('#log').html(JSON.stringify(data.result));
+                        if (!map) {
+                            init();
+                        }
+                        initMap2(hash, data.result.map);
+                    } else {
+                        showError('#log', data);
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+
+                $("#accordion").accordion({
+                    heightStyle: "content",
+                    animate: false,
+                    active: 1,
+                    collapsible: true
+                });
+
+
+                dialog = $("#dialog-form").dialog({
+                    autoOpen: false,
+                    height: 250,
+                    width: 650,
+                    modal: true,
+                    buttons: {
+                        "Aggiungi": doApplyImport,
+                        Cancel: function () {
+                            dialog.dialog("close");
+                        }
+                    },
+                });
+
+
+
+
+                var nice = true;
+                if (nice) {
+                    //init();
+                    //setBackgroundType('osm');
+                    //var extent = new OpenLayers.Bounds(maxExtent[0], maxExtent[1], maxExtent[2], maxExtent[3]);
+                    //m/ap.zoomToExtent(extent);
+                    initMap(originalHash);
+                }
+
+                $('#zoom').on('click', function () {
+                    var extent = new OpenLayers.Bounds(maxExtent[0], maxExtent[1], maxExtent[2], maxExtent[3]);
+                    map.zoomToExtent(extent);
+                });
+
+                $('#start').on('click', function () {
+                    initMap(originalHash);
+                });
+                $('#background-type').on('change', function () {
+                    setBackgroundType($(this).val());
+                });
+
+                $('#import').on('click', function () {
+                    dialog.dialog("open");
+                });
+
+                $('#import_1').on('change', function () {
+                    doImport();
+                });
+                $('#save').on('click', function () {
+                    currentHash = originalHash;
+                    applyChanges(true);
+                });
+                
+
+                $('#layer_1').html($('#layer_template').html());
+                $('#layer_2').html($('#layer_template').html());
+                $('#layer_3').html($('#layer_template').html());
+                $('#layer_4').html($('#layer_template').html());
+                
+                $('#layer_1').find('input,select').on('change', function() {
+                    applyChanges(false);
+                });
+                $('#layer_2').find('input,select').on('change', function() {
+                    applyChanges(false);
+                });
+                $('#layer_3').find('input,select').on('change', function() {
+                    applyChanges(false);
+                });
+                $('#layer_4').find('input,select').on('change', function() {
+                    applyChanges(false);
+                });
+                
+                $('#wfs').on('click', function() {
+                    wfsTest();
+                });
+                
+                $('#print').on('click', function() {
+                    print();
+                });
+                
+        
+                
+                $('input[data-element=remove]').on('click', function () {
+                    if (confirm('sei sicuro')){
+                        var id = $(this).parent().attr('id').substr(6);
+                        // console.log(mapDef.layers.length);
+                        $.each(mapDef.layers, function (pos, layer) {
+                            if (layer.order == id) {
+                                mapDef.layers.splice(pos, 1);
+
+                                doApplyRemoveLayer(currentHash, id);
+                                
+                                return false;
+                            }
+                        });
+                    }
+                    
+                });
+
+                getImportList();  // json con dati da importare
+
+            });
+            
+        </script>
+    </head>
+    <body>
+        <div id="layer_template" style="display: none">
+            Nome: <input data-element="name" style="width: 300px"> <br>
+            Tipo: <select data-element="type">
+                <option value="fill">Piena
+                <option value="point">Punti
+                <option value="pie">Torta
+                <option value="bar">Barre
+            </select> <br>
+            dim.min <input data-element="minSize" style="width: 100px;" value="" /> <br>
+            dim.max <input data-element="maxSize" style="width: 100px;" value="" /> <br>
+            dim.type: <select data-element="sizeType">
+                <option value="fixed">Fissa
+                <option value="variable">Variabile
+            </select> <br>
+            simbolo: <select data-element="symbol">
+                <option value="circle">Cerchio
+                <option value="triangle">Triangolo
+            </select> <br>
+            
+            Divisione: <select data-element="division">
+                <option value="manual">Manuale
+                <option value="natural">Naturale
+                <option value="quantile">Quantile
+                <option value="quantile-round">Quantile (Arrotondato)
+            </select> <br>
+
+            N.classi: <select data-element="class_no">
+                <option value="2">2
+                <option value="3">3
+                <option value="4">4
+                <option value="5">5
+                <option value="6">6
+                <option value="7">7
+            </select> <br>
+
+            <= <input data-element="class_1_number" style="width: 100px;" value="" /> <input data-element="class_1_color" style="width: 100px;" value="" /> <br>
+            <= <input data-element="class_2_number" style="width: 100px;" value="" /> <input data-element="class_2_color" style="width: 100px;" value="" /> <br>
+            <= <input data-element="class_3_number" style="width: 100px;" value="" /> <input data-element="class_3_color" style="width: 100px;" value="" /> <br>
+            oltre <input data-element="class_4_color" style="width: 100px;" value="" /> <br>
+
+            No color <input data-element="nodata_color" style="width: 100px;" value="" /> <br>
+            outline color <input data-element="outline_color" style="width: 100px;" value="" /> <br>
+            opacity <input data-element="opacity" style="width: 100px;" value="" /> <br>
+            Dec <input data-element="precision" style="width: 100px;" value="" /> <br>
+            udm <input data-element="unit" style="width: 100px;" value="" /> <br>
+            <br><input type="button" data-element="remove" value="Remove" /> 
+        </div>
+
+        <div id="dialog-form" title="Add layer">
+            <p class="validateTips">All form fields are required.</p>
+            <form>
+                Source: <select id="import_1" style="width: 550px"></select><br><br>
+                Sheet: <select id="import_sheet"></select><br>
+                Colonna geometrica: <select id="import_geo_col"></select><br>
+                Colonna dati: <select id="import_num_col"></select><br>
+            </form>
+        </div>
+
+        <div style="float:left">
+            <h3 style="margin: 5px;">MAP debug</h1>
+
+                <div style="width:700px; height:500px; border: 1px solid black" id="map"></div>
+                <input type="button" id="zoom" value="ZOOM">
+                <input type="button" id="start" value="START">
+                <!-- <input type="button" id="wfs" value="WFS"> -->
+                <input type="button" id="print" value="PRINT">
+                <a id="download" href="" target="_blank" style="display: none">DOWNLOAD</a>
+                <input type="text" id="event" style="width:100px; border: 1px solid black; background-color: #eeeeee" readonly />
+                <hr><textarea id="log" style="width: 700px; height: 100px; background-color: #eeeeee" readonly>LOG</textarea><br>
+                <input type="text" id="hash" style="width:700px; border: 1px solid black; background-color: #eeeeee" readonly />
+                </div>
+
+                <div style="float:left; border: 1px solid black; margin: 33px 0px 0px 10px">
+                    <form>
+                        Titolo: <input id="title" style="width: 300px"> <br>
+                        Descrizione: <input id="description" style="width: 300px"> <br>
+
+                        <div id="accordion" style="width: 400px">
+                            <h3>Cartografia di sfondo</h3>
+                            <div>
+                                <p>
+                                    Cartografia di sfondo:<select id="background-type"><option value="none">Nessuno<option value="osm">OSM</select>
+                                </p>
+                            </div>
+                            <h3>Layer 1</h3>
+                            <div>
+                                <p id="layer_1" />
+                            </div>
+                            <h3>Layer 2</h3>
+                            <div>
+                                <p id="layer_2" />
+                            </div>
+                            <h3>Layer 3</h3>
+                            <div>
+                                <p id="layer_3" />
+                            </div>
+                            <h3>Layer 4</h3>
+                            <div>
+                                <p id="layer_4" />
+                            </div>
+                        </div>
+                        Privato: <select id="private"><option value="true">Si<option value="false">No</select> <br>
+                        <input type="button" id="save" value="Salva">
+                        <input type="button" id="import" value="Aggiungi layer">
+                        
+                        
+                    </form>                    
+                </div>                
+
+                </body>
+                </html>

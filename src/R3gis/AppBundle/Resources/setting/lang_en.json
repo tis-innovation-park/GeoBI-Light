@@ -1,0 +1,7 @@
+{
+    "languages" : [
+        { "key": "en", "value": "EN:English" },
+        { "key": "de", "value": "EN:Deutsch" },
+        { "key": "it", "value": "EN:Italiano" }
+    ]
+}

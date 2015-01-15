@@ -1,0 +1,22 @@
+{
+    "title": "GeoBi",
+    "search": "Search",
+	"but_tutte": "All",
+	"but_lemiemappe": "My maps",
+	"but_creamappa1": "New",
+	"but_creamappa2": "map",
+	"box_linguamappa": "Map language",
+	"but_carica": "Load",
+	"but_nuova": "New",
+	"lab_autore": "Author",
+	"but_caricaaltre": "Load more",
+	"lab_cancellaremappa1": "Delete",
+	"lab_cancellaremappa2": "map",
+	"lab_seisicurocancellare": "Are you sure you want to delete this map?",
+	"but_annulla": "Cancel",
+	"but_conferma": "Yes",
+	"lab_copiamappa1": "Copy",
+	"lab_copiamappa2": "map",
+	"but_fatto": "Done",
+	"tip_visualizza": "Show"
+}

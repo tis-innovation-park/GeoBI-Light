@@ -1,0 +1,32 @@
+# PERMISSION
+# chmod -R g+w /data/sites/geobi/geobi/* ; chmod -R 777 /data/sites/geobi/geobi/app/cache/*
+
+
+JSON NECESSARI
+
+Json con testi:
+    /translations/<it|de|en>/app.json
+    /translations/<it|de|en>/map.json
+  Risposta (vedere compatibilità con tool agular):
+    {
+        "success": true,
+        "help": "Descrizione di cosa fa quest'api", (?)
+        "result": [
+            "format": 
+                "date": "dd/MM/yyyy",
+                "currency": "xxxx",
+            "data":
+                "KEY1": "VALUE1",
+                "KEY2": "VALUE2",
+        ]
+    }
+
+
+Elenco mappe
+    /maps/map.json?q=<testo libero>&lang=<it+de+en>&priv_only=<t|f>&order=<click|recent>&limit=10&offset=1
+
+
+
+Registrazione utenti
+
+// SS: See for authentication http://donna-oberes.blogspot.it/2013/09/user-login-and-logout-step-by-step-with.html

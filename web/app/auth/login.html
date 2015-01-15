@@ -1,0 +1,28 @@
+<section class="login" ng-controller="LoginController as login">
+    <div class="row">
+        <h3><i class="fa fa-user"></i> Pagina di accesso</h3>
+    </div>
+    <div class="row">
+        <form class="form-horizontal" role="form" name="loginForm" novalidate>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                    <input type="email" class="form-control" placeholder="Email" ng-model="login.credential.email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                    <input type="password" class="form-control" placeholder="Password" ng-model="login.credential.password" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-success btn-block" ng-click="login.login()" ng-disabled="!loginForm.$valid">Accedi</button>
+                <p class="help-block">
+                    <a class="pull-right text-muted" ui-sref="passwordreset"><small>Hai dimenticato la password?</small></a><br>
+                    <a class="pull-right text-muted" ui-sref="signup"><small>Registrati</small></a>
+                </p>
+            </div>
+        </form>
+    </div>
+</section>

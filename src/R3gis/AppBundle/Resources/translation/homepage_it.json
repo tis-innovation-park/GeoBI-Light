@@ -1,0 +1,22 @@
+{
+    "title": "GeoBi",
+    "search": "Ricerca",
+	"but_tutte": "Tutte",
+	"but_lemiemappe": "Le mie mappe",
+	"but_creamappa1": "Crea",
+	"but_creamappa2": "mappa",
+	"box_linguamappa": "Lingua mappa",
+	"but_carica": "Carica",
+	"but_nuova": "Nuova",
+	"lab_autore": "Autore",
+	"but_caricaaltre": "Carica altre",
+	"lab_cancellaremappa1": "Elimina",
+	"lab_cancellaremappa2": "mappa",
+	"lab_seisicurocancellare": "Sei sicuro di voler cancellare questa mappa?",
+	"but_annulla": "Annulla",
+	"but_conferma": "Conferma",
+	"lab_copiamappa1": "Copia",
+	"lab_copiamappa2": "mappa",
+	"but_fatto": "Fatto",
+	"tip_visualizza": "Visualizza"
+}

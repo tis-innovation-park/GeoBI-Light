@@ -1,0 +1,11 @@
+<h2><span class="ngdialog-span-title">{{$root.text.homepage.lab_copiamappa1}}</span> {{$root.text.homepage.lab_copiamappa2}}</h2>
+<div class="form">
+    <div class="form-group">
+        <label>{{$root.text.homepage.box_linguamappa}}</label>
+        <select class="form-control" ng-model="copymap.lang" ng-options="sign as lang for (sign, lang) in copymap.languages">
+        </select>
+    </div>
+    <div class="form-group text-right">
+        <button class="btn btn-default" ng-click="copymap.copyMap(ngDialogData.hash)">{{$root.text.homepage.but_fatto}}</button>
+    </div>
+</div>

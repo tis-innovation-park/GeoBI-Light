@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="it">   <!-- lang passato da app -->
+    <head>
+        <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+        <script>
+            var urlPrefix = '{{ url_prefix }}';
+            var mapHash;
+
+            var wsse = 'UsernameToken Username="admin", PasswordDigest="oOnCYJvML4wO0AvR6zA7lDXX6zk=", Nonce="OGYwMjkzOTEwOTcwMmNiOQ==", Created="2014-10-19T18:45:56Z"';
+            var importDataResult;
+
+            function showError(element, data) {
+                console.log(data);
+                if (data.success) {
+                } else {
+                    if (data.error) {
+                        $(element).val(data.error);
+                    } else {
+                        $(element).val(data);
+                    }
+                }
+            }
+
+            function setLang(lang) {
+                lang = lang.substring(0, 2);
+                $.getJSON(urlPrefix + "translation/" + lang + "/app.json", function (data) {
+                    if (data.success) {
+                        $('#translation').html(JSON.stringify(data.result));
+                    } else {
+                        showError('#translation', data);
+                    }
+                });
+            }
+            
+            function getSettings(lang, what) {
+                $.getJSON(urlPrefix + "setting/" + lang + "/" + what + ".json", function (data) {
+                    if (data.success) {
+                        $('#translation').html(JSON.stringify(data.result));
+                    } else {
+                        showError('#translation', data);
+                    }
+                });
+            }
+
+
+
+            function getMapList() {
+                var lang = '';
+                if ($('#q_it').prop('checked')) {
+                    lang += 'it ';
+                }
+                if ($('#q_de').prop('checked')) {
+                    lang += 'de ';
+                }
+                if ($('#q_en').prop('checked')) {
+                    lang += 'en ';
+                }
+
+                var priv_only = $('#q_priv_only').prop('checked') ? 't' : 'f';
+
+                var order = $('#q_order').val();
+
+                var limit = $('#q_limit').val();
+                var offset = $('#q_offset').val();
+
+                var opt = {
+                    q: $('#q').val(),
+                    lang: lang,
+                    priv_only: priv_only,
+                    order: order,
+                    limit: limit,
+                    offset: offset
+                };
+
+                $.getJSON(urlPrefix + "map/maps.json", opt, function (data) {
+                    if (data.success) {
+                        $('#maps').html(JSON.stringify(data.result));
+                    } else {
+                        showError('#maps', data);
+                    }
+                });
+            }
+
+            function getUserList() {
+                var url = urlPrefix + 'user/users.json';
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    headers: {
+                        'X-WSSE': wsse,
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            $('#users').html(JSON.stringify(data.result));
+                        } else {
+                            showError('#users', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR);
+                        alert('Error getting ' + url + ': ' + textStatus + ' ' + errorThrown);
+                    }
+                });
+            }
+
+
+            // Registra utente
+            function register() {
+                $("#u_log").val('');
+                var opt = {
+                    name: $('#u_name').val(),
+                    email: $('#u_email').val(),
+                    login: $('#u_login').val(),
+                    password: $('#u_password').val(),
+                    captcha: $('#u_captcha').val(),
+                    child: {
+                        a: 'b',
+                        c: {
+                            e: 'f',
+                            g: {
+                                h: 'ultimo nodo',
+                                i: [1, 2, 3]
+                            }
+                        }
+                    }
+                };
+                $.post(urlPrefix + "register/", opt, function (data) {
+                    if (data.success) {
+                        $("#u_log").val(JSON.stringify(data.result));
+                    } else {
+                        showError('#u_log', data);
+                    }
+                });
+            }
+
+            // Richiede una nuova mail per la registrazione
+            function requestMail() {
+                $("#u_log").val('');
+                var opt = {
+                    email: $('#u_email').val(),
+                    captcha: $('#u_captcha').val(),
+                };
+                $.post(urlPrefix + "register/request_mail/", opt, function (data) {
+                    if (data.success) {
+                        $("#u_log").val(JSON.stringify(data.result));
+                    } else {
+                        showError('#u_log', data);
+                    }
+                });
+            }
+
+            function login() {
+                $("#login_log").val('');
+                var opt = {
+                    login: $('#login').val(),
+                    password: $('#passowrd').val(),
+                };
+                $.ajax({
+                    url: urlPrefix + 'users/login',
+                    type: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (msg) {
+                        alert('OK');
+                        //$("#results").append("The result =" + StringifyPretty(msg));
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert('errore ' + textStatus + ' ' + errorThrown);
+                    }
+                });
+
+                /*$.post( "users/login", opt, function( data ) {
+                 if (data.success) {
+                 $( "#login_log" ).val(JSON.stringify(data.result));
+                 } else {
+                 showError('#login_log', data);
+                 }    
+                 });*/
+            }
+
+            function getImportList() {
+                importDataResult = null;
+                $('#import_1_url').val('');
+                $('#import_sheet,#import_geo_col,#import_num_col').empty();
+                $.getJSON(urlPrefix + "ckan/packages.json", function (data) {
+                    if (data.success) {
+                        $select = $('#import_1');
+                        $.each(data.result, function (dummy, mainData) {
+                            var mainTitle = mainData.name;
+                            $.each(mainData.resources, function (dummy, data) {
+                                var id = mainData.id + '|' + data.id;
+                                var name = mainTitle + ' - ' + data.name + ' (' + data.format + ')';
+                                $select.append('<option data-ref="' + data.url + '" value="' + id + '">' + name + '</option>');
+                            });
+                        });
+                        setCkanUrl();
+                    } else {
+                        showError('#import', data);
+                    }
+                });
+            }
+
+            function fillImportColumns() {
+                var val = $('#import_sheet').val();
+
+                $('#import_geo_col,#import_num_col').empty();
+
+                $geoSelect = $('#import_geo_col');
+                $numSelect = $('#import_num_col');
+
+                $.each(importDataResult, function (dummy, mainData) {
+                    if (mainData.code == val) {
+                        $('#btnImport2').prop('disabled', !mainData.is_valid);
+                        if (mainData.is_shape) {
+                            $geoSelect.append('<option value="">[SHAPE]</option>');
+                            $numSelect.append('<option value="">[NESSUNA]</option>');
+                        }
+                        $.each(mainData.headers, function (dummy, header) {
+                            if (header.spatial_data) {
+                                $geoSelect.append('<option value="' + header.column + '">' + header.name + '</option>');
+                            }
+                            if (header.numeric_data) {
+                                $numSelect.append('<option value="' + header.column + '">' + header.name + '</option>');
+                            }
+                        });
+                    }
+                });
+            }
+
+            function doImport() {
+                importDataResult = null;
+                $('#import_sheet,#import_geo_col,#import_num_col').empty();
+                $("#import_log").val('');
+                $("#import_log_url").val('');
+                var k = $('#import_1').val().split('|');
+
+                $.ajax({
+                    url: urlPrefix + 'ckan/' + k[0] + '/' + k[1] + '/tables.json',
+                    type: 'GET',
+                    dataType: 'json',
+                    contentType: 'application/json; charset=UTF-8',
+                    //data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            $("#import_log").val(JSON.stringify(data.result));
+
+                            importDataResult = data.result;
+                            $select = $('#import_sheet');
+                            // Populate sheet
+                            $.each(data.result, function (dummy, mainData) {
+                                $select.append('<option value="' + mainData.code + '">' + mainData.name + '</option>');
+                            });
+                            fillImportColumns();
+                        } else {
+                            showError('#import_log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#import_log', errorThrown);
+                    }
+                });
+            }
+
+            function doApplyImport() {
+                $("#import_log_2").val('');
+                var k = $('#import_1').val().split('|');
+                var table = $('#import_sheet').val();
+                if (table == '' || table == 'null' || table == null) {
+                    table = '';
+                }
+                
+                var opt = {
+                    lang: $("#import_lang").val(),
+                    spatial_column: $("#import_geo_col").val(),
+                    data_column: $("#import_num_col").val()
+                };
+                
+                $.ajax({
+                    url: urlPrefix + 'import/ckan/' + k[0] + '/' + k[1] + '/' + table,
+                    type: 'POST',
+                    dataType: 'json',
+                    // contentType: 'application/json; charset=UTF-8',
+                    data: opt,
+                    // processData: false,
+                    success: function (data) {
+                        if (data.success) {
+                            $("#import_log_2").val(JSON.stringify(data.result));
+                            mapHash = data.result.hash;
+                        } else {
+                            showError('#import_log_2', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#import_log_2', errorThrown);
+                    }
+                });
+            }
+
+
+            function getNewMap() {
+                importDataResult = null;
+                $("#import_log").val('');
+
+                $.ajax({
+                    url: urlPrefix + 'map',
+                    type: 'POST',  // SS: Temporary -> POST
+                    dataType: 'json',
+                    //contentType: 'application/json; charset=UTF-8',
+                    data: {
+                        lang: $("#import_lang").val()
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            $("#import_log_2").val(JSON.stringify(data.result));
+                            mapHash = data.result.hash;
+                        } else {
+                            showError('#import_log', data);
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        showError('#import_log', errorThrown);
+                    }
+                });
+            }
+            
+            function getTableData() {
+                var k = $('#import_1').val().split('|');
+                var table = $('#import_sheet').val();
+                if (table == '' || table == 'null' || table == null) {
+                    table = '';
+                } else {
+                    table = table + '/';
+                }
+                $.getJSON(urlPrefix + 'ckan/' + k[0] + '/' + k[1] + '/' + table + 'data.json', function (data) {
+                    if (data.success) {
+                        $('#translation').html(JSON.stringify(data.result));
+                    } else {
+                        showError('#translation', data);
+                    }
+                });
+            }
+            
+            function setCkanUrl() {
+                $('#import_1_url').val( $('#import_1 option:selected').attr('data-ref') );
+            }
+            
+            $(document).ready(function () {
+                
+                getSettings('it', 'map');
+                
+                setLang('it'); // preso dal browser
+                getMapList();
+                getUserList();
+                getImportList();  // json con dati da importare
+
+                $('#q,#q_limit,#q_offset').on('input', function () {
+                    getMapList()
+                });
+                $("#import_1").on('change', function () {
+                    setCkanUrl();
+                });
+
+                $('#q_it,#q_de,#q_en,#q_priv_only').on('click', function () {
+                    getMapList()
+                });
+                $('#q_order').on('change', function () {
+                    getMapList()
+                });
+
+                $('#btnLogin').on('click', function () {
+                    login()
+                });
+                $('#register').on('click', function () {
+                    register()
+                });
+                $('#register2').on('click', function () {
+                    requestMail()
+                });
+                $('#btnImport').on('click', function () {
+                    doImport()
+                });
+                $('#btnImport2').on('click', function () {
+                    doApplyImport()
+                });
+                $('#btnInfo').on('click', function () {
+                    getTableData();
+                });
+
+                $('#import_sheet').on('change', function () {
+                    fillImportColumns()
+                });
+                
+                $('#open_map').on('click', function () {
+                    window.open("map/" + mapHash);
+                });
+                
+                $('#btnNewMap').on('click', function () {
+                    getNewMap();
+                });
+                
+                
+
+
+
+            });
+        </script>
+    </head>
+    <body>
+        <h1>API debug</h1>
+        <form>
+            Testi <a href="javascript:setLang('it')">IT<a> | <a href="javascript:setLang('de')">DE<a> | <a href="javascript:setLang('en')">EN<a><br>
+                                    <textarea id="translation" style="width: 1000px; background-color: #eeeeee" readonly></textarea><br>
+                                    <hr>
+
+                                    Mappe: Cerca: <input id="q" style="width: 100px"> 
+                                    || <input type="checkbox" id="q_it">IT | <input type="checkbox" id="q_de">DE <input type="checkbox" id="q_en">EN || <input type="checkbox" id="q_priv_only">Solo le mie mappe
+                                    || Ordina: <select id="q_order"><option>--<option value="recent">Recenti<option value="click">Più cliccate</select>
+                                    || Limit: <input type="text" id="q_limit" style="width: 30px;"> Offset: <input type="text" id="q_offset" style="width: 30px;">
+                                    <br>
+                                    <textarea id="maps" style="width: 1000px; background-color: #eeeeee" readonly></textarea><br>
+                                    <hr>
+
+                                    Utenti:<br>
+                                    Login: <input id="login" style="width: 100px"> | Password: <input id="password" style="width: 100px"> | <input type="button" id="btnLogin" value="Login"> | <input id="login_log" style="width: 200px; background-color: #eeeeee" readonly>
+
+                                    <textarea id="users" style="width: 1000px; background-color: #eeeeee" readonly></textarea><br>
+                                    Registra: Nome: <input id="u_name" style="width: 100px"> | Mail: <input id="u_email" style="width: 100px"> | Captcha: <input id="u_captcha" style="width: 100px"> | 
+                                    <input type="button" id="register" value="REGISTRA"> | <input type="button" id="register2" value="NUOVA MAIL">
+                                    Captcha: <img src="{{ url_prefix }}captcha/qualunquecosaperilmomento.png" />
+                                    <input id="u_log" style="width: 200px; background-color: #eeeeee" readonly>
+
+                                    <hr>
+
+                                    Import: <select id="import_1"></select> <input type="button" id="btnImport" value="IMPORT (1)"> <br>
+                                    <textarea id="import_log" style="width: 1000px; background-color: #eeeeee" readonly></textarea><br>
+                                    <input type="text" id="import_1_url" style="width: 1000px; background-color: #eeeeee" readonly><br>
+                                    Sheet: <select id="import_sheet"></select> | Colonna geometrica: <select id="import_geo_col"></select> | Colonna dati: <select id="import_num_col"></select> | 
+                                    | Lang: <select id="import_lang"><option value="it">IT<option value="de">DE<option value="en">EN</select>
+                                    <input type="button" id="btnInfo" value="INFO"> | <input type="button" id="btnImport2" value="IMPORT (2)"> <br>
+                                    <textarea id="import_log_2" style="width: 1000px; background-color: #eeeeee" readonly></textarea><br>
+                                    <hr>
+
+                                    <input type="button" id="btnNewMap" value="Nuova mappa"> 
+                                    <input type="button" id="open_map" value="APRI MAPPA">
+                                    
+                                    </form>
+                                    </body>
+                                    </html>

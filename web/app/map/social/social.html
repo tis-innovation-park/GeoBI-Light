@@ -1,0 +1,63 @@
+<h2><span class="ngdialog-span-title">{{$root.text.map.lab_condividilamappa1}}</span> {{$root.text.map.lab_condividilamappa2}}</h2>
+<ul class="nav nav-tabs">
+    <li role="presentation"><label class="nav-tab-custom-label" for="share_label" ng-class="{active: socialTab == 1}">{{$root.text.map.tip_condividi}}</label></li>
+<!--     <li role="presentation"><label class="nav-tab-custom-label" for="code_label" ng-class="{active: socialTab == 2}">{{$root.text.map.tab_codicedaincorporare}}</label></li> -->
+    <li role="presentation"><label class="nav-tab-custom-label" for="email_label" ng-class="{active: socialTab == 3}">{{$root.text.map.tab_email}}</label></li>
+</ul>
+<div class="tab-content" ng-init="socialTab = 1">
+    <input type="radio" class="input-hidden tab-to-active" id="share_label" ng-model="socialTab" value="1" >
+    <div role="tabpanel" class="tab-pane fade in tab-active" id="share" aria-labelledby="share-tab">
+        <div class="form-inline">
+            <input class="form-control" type="text" ng-model="social.url" disabled>
+            <a target="blank" ng-href="https://www.facebook.com/share.php?u={{social.url}}" class="btn btn-social-icon btn-facebook"><i class="fa fa-facebook"></i></a>
+            <a target="blank" ng-href="http://twitter.com/intent/tweet?url={{social.url}}" class="btn btn-social-icon btn-twitter"><i class="fa fa-twitter"></i></a>
+            <a target="blank" ng-href="http://www.linkedin.com/shareArticle?url={{social.url}}" class="btn btn-social-icon btn-linkedin"><i class="fa fa-linkedin"></i></a>
+            <a target="blank" ng-href="https://plus.google.com/share?url={{social.url}}" class="btn btn-social-icon btn-google-plus"><i class="fa fa-google-plus"></i></a>
+        </div>
+    </div>
+<!--     <input type="radio" class="input-hidden tab-to-active" id="code_label" ng-model="socialTab" value="2">
+    <div role="tabpanel" class="tab-pane fade in tab-active" id="code" aria-labelledby="code-tab">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="map-size" class="col-sm-4 control-label">{{$root.text.map.lab_dimensionemappa}}</label>
+                <div class="col-sm-8">
+                    <select class="form-control">
+                        <option>560x315 px</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <textarea class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <input type="radio" class="input-hidden tab-to-active" id="email_label" ng-model="socialTab" value="3">
+    <div role="tabpanel" class="tab-pane fade in tab-active" id="email" aria-labelledby="email-tab">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label for="map-size" class="col-sm-3 control-label">{{$root.text.map.lab_inviaa}}</label>
+                <div class="col-sm-9">
+                    <input type="email" class="form-control" ng-model="social.to">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="map-size" class="col-sm-3 control-label">Oggetto</label>
+                <div class="col-sm-9">
+                    <input type="text" class="form-control" ng-model="social.subject">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12">
+                    <textarea class="form-control" rows="5" ng-model="social.body"></textarea>
+                </div>
+            </div>
+            <div class="form-group text-right">
+                <div class="col-sm-12">
+                    <a class="btn btn-default" target="blank" ng-href="mailto:{{social.to}}?subject={{social.subject}}&body={{social.body}}">{{$root.text.map.but_invia}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

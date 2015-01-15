@@ -1,0 +1,35 @@
+<h2><span class="ngdialog-span-title">Correggi</span> dati</h2>
+<div class="alert alert-warning">Messaggio</div>
+<table class="table-bordered table-condensed correction-data" ng-show="editData.rows.length > 0">
+    <thead>
+        <tr>
+            <th>{{editData.header.spatialColumn}}</th>
+            <th>correzione</th>
+            <th>{{editData.header.dataColumn}}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="r in editData.rows">
+            <td class="col-sm-3 td-reset-align">
+                <input type="text" class="form-control input-sm data-no" ng-model="r.spatialColumn" ng-change="editData.getAutocompleteOptions($index, r.spatialColumn)">
+                
+            </td class="col-sm-3 td-reset-align">
+            <td>
+                <select class="form-control input-sm data-yes" ng-model="editData.tempData[$index].correctValue" ng-options="option as option.value for option in editData.tempData[$index].autoComplete | orderBy: option.priority" ng-disabled="editData.tempData[$index].autoComplete < 1">
+                    <option value="">-- selezionare correzione --</option>
+                </select>
+            </td>
+            <td class="col-sm-3 td-reset-align">
+                <span>{{r.dataColumn}}</span>
+            </td>
+            <td class="col-sm-2 td-reset-align">
+                <button class="btn btn-danger btn-sm" ng-click="editData.cancelData($index)"><i class="fa fa-times"></i></button>
+                <button class="btn btn-success btn-sm" ng-disabled="!editData.tempData[$index].correctValue" ng-click="editData.saveData($index)"><i class="fa fa-check"></i></button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<p ng-hide="editData.rows.length > 0">
+Non ci sono dati da correggere
+</p>

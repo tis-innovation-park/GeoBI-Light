@@ -1,0 +1,17 @@
+{
+    "user": {
+        "roles": {
+            "options": [
+                { "key": "admin", "value": "Administrator" },
+                { "key": "map_producer", "value": "Map producer" }
+            ]
+        },
+        "status": {
+            "options": [
+                { "key": "W", "value": "Waiting for account-validation" },
+                { "key": "E", "value": "Enabled" },
+                { "key": "D", "value": "Disabled" }
+            ]
+        }
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "background": {
+        "source": {
+            "options": [
+                { "key": "none", "value": "DE:Nessuno" },
+                { "key": "osm", "value": "OpenStreetMap" }
+            ]
+        }
+    },
+    "statistic": {
+        "type": {
+            "options": [
+                { "key": "fill", "value": "DE: Pieno" },
+                { "key": "point", "value": "DE: Punkt" }
+            ]
+        },
+        "sizeType": {
+            "options": [
+                { "key": "fixed", "value": "DE: fixed" },
+                { "key": "variable", "value": "DE: variable" }
+            ]
+        },
+        "divisionType": {
+            "options": [
+                { "key": "manual", "value": "DE: manual" },
+                { "key": "natural", "value": "DE: natural" },
+                { "key": "quantile-round", "value": "DE: quantile-round" }
+            ]
+        },
+        "divisionNumber": {
+            "options": [
+                { "key": "2", "value": "2" },
+                { "key": "3", "value": "3" },
+                { "key": "4", "value": "4" },
+                { "key": "5", "value": "5" },
+                { "key": "6", "value": "6" },
+                { "key": "7", "value": "7" }
+            ]
+        },
+        "opacity": true,
+        "numericColumn": {
+            "unit": true,
+            "precision": true
+        },
+        "source": true
+    }
+}

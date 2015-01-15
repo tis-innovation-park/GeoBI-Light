@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html ng-app="geobi" lang="it">   <!-- lang passato da app -->
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        
+        <meta property="og:title" content="{{mapinfo.name}}" />
+        <meta property="og:site_name" content="GeoBI"/>
+        <meta property="og:url" content="http://{{ app.request.getHttpHost() }}" />
+        <meta property="og:description" content="{{mapinfo.description}}" />
+        <meta property="fb:app_id" content="{#{FB_APP_ID}#}" />
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="it_IT" />            <!-- Default -->
+        <meta property="og:locale:alternate" content="de_DE" />  <!-- French -->
+        <meta property="og:locale:alternate" content="en_US" />  <!-- Italian -->
+        <meta property="og:image" content="/map/stat/{{maphash}}/1200/630/preview.png" />
+        
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/ng-dialog/0.3.2/css/ngDialog.min.css">
+        <link rel="shortcut icon" href="app/styles/img/favicon.ico" />
+
+        <title>GeoBI - {{mapinfo.name}}</title>
+       
+        
+        <!-- Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="app/styles/css/font-awesome.min.css" type="text/css" />
+        
+        <!-- Style -->
+        <link rel="styleSheet" href ="app/styles/css/reset.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/bootstrap.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/geobi.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/colorpicker.css" type="text/css" />
+    </head>
+    <body>
+        
+        <h1>GeoBI - {{mapinfo.name}}</h1>
+        <p>{{mapinfo.description}}</p>
+        <img src="/map/stat/{{maphash}}/1200/630/preview.png" alt="map title">
+
+
+    </body>
+</html>

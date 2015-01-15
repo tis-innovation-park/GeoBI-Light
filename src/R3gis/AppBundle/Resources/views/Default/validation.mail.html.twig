@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="it">   <!-- lang passato da app -->
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <h1>Welcome to GeoBI, {{ name }}!</h1>
+        
+        <p>
+            We received a registration for a user with this email address. 
+            To complete registration, please click <a href="{{ url('validateemail') }}/{{ hash }}">here</a> or 
+            copy the following link into the address bar of your browser: <br>
+            {{ url('validateemail') }}/{{ hash }}
+        </p>
+        
+        <p>
+            You have 24 hours to activate the link, afterwards you'll have to request a new activation link.<br>
+            If you did not register on our site, please ignore this email.
+        </p>
+        
+        <p>
+            Best regards,<br>
+            the GeoBI-team.
+        </p>
+    </body>
+</html>

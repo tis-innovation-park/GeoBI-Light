@@ -1,0 +1,65 @@
+<section>
+    <div class="container-fluid main-container-geobi">
+        <div class="row main-content" ng-controller="MapsListController as mapslist">
+            <header class="filter-header">
+                <div class="col-sm-4 col-xs-12">
+                    <div class="form-group">
+                        <input type="radio" class="input-hidden" id="filters_priv_only_false" ng-model="mapslist.filters.priv_only" ng-value="false">
+                        <input type="radio" class="input-hidden" id="filters_priv_only_true" ng-model="mapslist.filters.priv_only" ng-value="true">
+                        <div class="btn-group" ng-show="app.isAuth()">
+                            <label class="label-clear-style btn btn-default" for="filters_priv_only_false">{{$root.text.homepage.but_tutte}}</label>
+                            <label class="label-clear-style btn btn-default" for="filters_priv_only_true">{{$root.text.homepage.but_lemiemappe}}</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8 col-xs-12 text-right">
+                    <form class="form-inline">
+                        <div class="form-group btn-group" ng-show="app.isAuth()">
+                            <button ng-click="mapslist.newMap()" class="btn btn-default btn-create">{{$root.text.homepage.but_creamappa1}} <span>{{$root.text.homepage.but_creamappa2}}</span></button>
+                            <button ng-click="mapslist.newMap()" class="btn btn-plus"><i class="fa fa-plus"></i></button>
+                        </div>
+                        <div class="form-group input-group">
+                            <input type="text" ng-model="mapslist.filters.q" class="form-control form-search" placeholder="{{$root.text.homepage.search}}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-search" type="submit"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" class="input-hidden" id="filters_it" ng-model="mapslist.filters.it">
+                            <input type="checkbox" class="input-hidden" id="filters_de" ng-model="mapslist.filters.de">
+                            <input type="checkbox" class="input-hidden" id="filters_en" ng-model="mapslist.filters.en">
+                            <div class="form-group btn-group language-group">
+                                <label class="label-clear-style btn btn-default" for="filters_it">IT</label>
+                                <label class="label-clear-style btn btn-default" for="filters_de">DE</label>
+                                <label class="label-clear-style btn btn-default" for="filters_en">EN</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </header>
+            <section>
+                <ul class="map-layout">
+                    <li class="thumbnail thumbnail-geobi" ng-repeat="map in mapslist.data" >
+                        <img ng-src="{{app.setting.baseUrl}}map/stat/{{map.hash}}/255/200/preview.png?t={{map.modDate}}" class="preview-map">
+                        <h3>{{map.name}}</h3>
+                        <p>{{map.description}}</p>
+                        <p><b>{{$root.text.homepage.lab_autore}}: </b>{{map.user}}</p>
+                        <p><time datetime="{{map.modDate}}">{{map.modDate | date: 'HH:mm dd/MM/yyyy' }}</time></p>
+                        <div class="thumbnail-hover">
+                            <!-- <button class="btn btn-default btn-action-map"><i class="fa fa-info-circle"></i></button> -->
+                            <a href="#/map/{{map.hash}}" class="btn btn-default btn-action-map" title="{{$root.text.homepage.tip_visualizza}}"><i class="fa fa-eye fa-lg"></i></a>
+                            <button ng-show="app.isAuth()" class="btn btn-default btn-action-map btn-copy-map" ng-click="mapslist.copyMap(map.hash)" title="{{$root.text.homepage.lab_copiamappa1}} {{$root.text.homepage.lab_copiamappa2}}"><i class="fa fa-map-marker fa-lg"></i></button>
+                            <button ng-show="map.isMine || app.isAdmin()" class="btn btn-default btn-action-map" ng-click="mapslist.deleteMap($index)" title="{{$root.text.homepage.lab_cancellaremappa1}}"><i class="fa fa-trash-o fa-lg"></i></button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="text-center load-more">
+                    <button ng-hide="mapslist.areAllMapsLoading()" ng-click="mapslist.loadMore()" class="btn btn-default">{{$root.text.homepage.but_caricaaltre}}</button>  
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+
+<!--order:
+<input type="text" ng-model="mapslist.filters.order">-->

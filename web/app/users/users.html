@@ -1,0 +1,57 @@
+<section ng-controller="UserListController as userlist">
+    <div class="container-fluid users-container">
+        <!-- Filtro -->
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="form-group input-group">
+                    <input type="text" class="form-control form-search" placeholder="Ricerca" ng-model="userlist.q">
+                    <span class="input-group-btn">
+                        <button class="btn btn-search" type="submit"><i class="fa fa-search"></i></button>
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-5 text-right">
+                <div class="form-group btn-group" ng-click="userlist.newUser()">
+                    <button ng-click="" class="btn btn-default btn-create">Nuovo <span>utente</span></button>
+                    <button ng-click="" class="btn btn-plus"><i class="fa fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+        <!-- Tabella -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table">
+                    <table class="table table-bordered table-hover table-condensed">
+                        <thead>
+                            <tr>
+                                <th>{{$root.text.user.lbl_login}}</th>
+                                <th>{{$root.text.user.lbl_nome}}</th>
+                                <th>{{$root.text.user.lbl_gruppo}}</th>
+                                <th class="action-column">{{$root.text.user.lbl_azione}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="user in userlist.data | filter:userlist.q">
+                                <td>{{user.email}}</td>
+                                <td>{{user.name}}</td>
+                                <td>{{user.group.name}}</td>
+                                <td class="form-inline text-right">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-show btn-action-column" title="Invia link di attivazione" ng-show="user.status === 'W'" ng-click="userlist.sendActivationLink($index)"> <i class="fa fa-envelope" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
+                                        <button type="button" class="btn btn-action-column" title="Reset password" ng-hide="user.status === 'W'" ng-click="userlist.resetPassword($index)"> <i class="fa fa-key" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-edit btn-action-column" title="{{$root.text.user.ttp_modifica}}" ng-click="userlist.editUserDialog($index)"> <i class="fa fa-pencil"></i></button>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-delete btn-action-column" title="{{$root.text.user.ttp_cancella}}" ng-click="userlist.deleteUser(user.id)"> <i class="fa fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
