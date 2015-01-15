@@ -1,0 +1,285 @@
+MAP
+NAME "stat"
+SIZE 500 500
+MAXSIZE 4096
+RESOLUTION 72
+FONTSET [AUTHOR_PATH]fonts/fonts.list
+
+# CONFIG 'MS_ERRORFILE' '[AUTHOR_PATH]config/debug/stat.debug'
+# DEBUG 5
+
+WEB
+	METADATA
+		"ows_title"	"stat"
+		"wfs_encoding"	"UTF-8"
+		"wms_encoding"	"UTF-8"
+    	"wms_onlineresource" "[AUTHOR_URL]services/ows.php?project=geobi&map=stat"
+    	"wfs_onlineresource" "[AUTHOR_URL]services/ows.php?project=geobi&map=stat"
+		"wms_feature_info_mime_type"	"text/html"
+		"wfs_namespace_prefix"	"feature"
+		"wms_srs"	"EPSG:[SRID]"
+	END
+	IMAGEPATH "/tmp/"
+	IMAGEURL "/tmp/"	
+END	
+PROJECTION
+	"init=epsg:[SRID]"
+END
+
+EXTENT 737779 4231225 2061823 5957355
+
+LAYER
+	NAME "stat"
+    GROUP "stat"
+	TYPE POLYGON
+	STATUS ON
+	METADATA
+		"wms_group_title" "Statistic"
+		"ows_title"	"Statistic"
+		"wms_title"	"Statistic"
+	END
+	PROJECTION
+		"init=epsg:[SRID]"
+	END
+	CONNECTIONTYPE POSTGIS
+	# CONNECTION "user=geobi password=geobi dbname=geobi host=127.0.0.1 port=5432"
+    DATA "the_geom FROM data.area_part_municipality USING UNIQUE ar_id USING SRID=[SRID]"
+	#PROCESSING "CLOSE_CONNECTION=DEFER"
+	SIZEUNITS pixels
+#	CLASS
+#		NAME "nazione" 
+#		TITLE "Confine nazionale"
+#            # EXPRESSION ([ar_id] <= 1)
+#            # EXPRESSION ([ar_id] <= 2)
+#            # EXPRESSION ([ar_id] <= 3)#
+#		STYLE
+#			COLOR 255 0 0
+#            OPACITY 65
+#		END
+#       STYLE
+#			OUTLINECOLOR 0 0 0
+#			SYMBOL "CIRCLE"
+#			SIZE 1
+#			WIDTH 1
+#		END
+#        LABEL
+#			TYPE TRUETYPE
+#			PARTIALS TRUE
+#	    		FONT "dejavu-sans-bold"
+#			COLOR 128 0 128
+#			OUTLINECOLOR 255 255 255
+#			SIZE 8
+#			#MINSIZE 8
+#			#MAXSIZE 8
+#			POSITION CC
+#            BUFFER 20
+#		#WRAP '\'
+#		END
+#	END
+END
+
+    
+###### SYMBOLS #######
+SYMBOL
+NAME "TENT"
+TYPE VECTOR
+FILLED TRUE
+POINTS
+0 1
+.5 0
+1 1
+.75 1
+.5 .5
+.25 1
+0 1
+END
+END
+SYMBOL
+NAME "TRIANGLE"
+TYPE VECTOR
+FILLED TRUE
+POINTS
+0 1
+.5 0
+1 1
+0 1
+END
+END
+SYMBOL
+NAME "SQUARE"
+TYPE VECTOR
+FILLED TRUE
+POINTS
+0 1
+0 0
+1 0
+1 1
+0 1
+END
+END
+SYMBOL
+NAME "PLUS"
+TYPE VECTOR
+POINTS
+.5 0
+.5 1
+-99 -99
+0 .5
+1 .5
+END
+END
+SYMBOL
+NAME "CROSS"
+TYPE VECTOR
+POINTS
+0 0
+1 1
+-99 -99
+0 1
+1 0
+END
+END
+SYMBOL
+NAME "CIRCLE"
+TYPE ELLIPSE
+FILLED TRUE
+POINTS
+1 1
+END
+END
+SYMBOL
+NAME "HATCH"
+TYPE HATCH
+END
+SYMBOL
+NAME "1-3"
+Type ELLIPSE
+	Points
+	  1 1
+	END
+	STYLE
+		1 3
+	END
+END
+SYMBOL
+NAME "2-3"
+Type ELLIPSE
+	Points
+	  1 1
+	END
+	STYLE
+		2 3
+	END
+END
+SYMBOL
+NAME "3-3"
+Type ELLIPSE
+  Points
+    1 1
+  END
+  STYLE
+    3 3
+  END 
+END
+SYMBOL
+NAME "5-5"
+Type ELLIPSE
+  Points
+    1 1
+  END
+  STYLE
+    5 5
+  END 
+END
+SYMBOL
+NAME "HORIZONTAL"
+TYPE VECTOR
+POINTS
+0 .5
+1 .5
+END
+END
+SYMBOL
+NAME "SQUARE_HALF"
+TYPE VECTOR
+FILLED TRUE
+POINTS
+0 0
+0 1
+1 0
+0 0
+END
+END
+SYMBOL
+NAME "CIRCLE_FILL"
+TYPE ELLIPSE
+FILLED TRUE
+POINTS
+1 1
+END
+	GAP 2
+END
+SYMBOL
+NAME "VERTICAL"
+TYPE VECTOR
+POINTS
+.5 0
+.5 1
+END
+END
+LEGEND
+    STATUS ON
+    KEYSIZE 16 10
+    TRANSPARENT ON
+    LABEL
+       TYPE TRUETYPE
+       FONT 'verdana'
+       SIZE 8
+       COLOR 1 1 1
+    END
+END
+
+OUTPUTFORMAT	
+	NAME "AGG PNG 24 bit"
+	DRIVER "AGG/PNG"
+	MIMETYPE "image/png; mode=24bit"
+	IMAGEMODE RGB
+	EXTENSION "png"
+	TRANSPARENT ON
+	FORMATOPTION "INTERLACE=OFF"
+END
+OUTPUTFORMAT	
+	NAME "AGG PNG"
+	DRIVER "AGG/PNG"
+	MIMETYPE "image/png"
+	IMAGEMODE RGB
+	EXTENSION "png"
+	TRANSPARENT ON
+	FORMATOPTION "INTERLACE=OFF"
+END
+OUTPUTFORMAT	
+	NAME "AGG PNG"
+	DRIVER "AGG/PNG"
+	MIMETYPE "image/png"
+	IMAGEMODE RGB
+	EXTENSION "png"
+	TRANSPARENT ON
+	FORMATOPTION "INTERLACE=OFF"
+    FORMATOPTION "QUANTIZE_FORCE=ON"
+		FORMATOPTION "QUANTIZE_DITHER=OFF"
+		FORMATOPTION "QUANTIZE_COLORS=256"
+END
+OUTPUTFORMAT	
+	NAME "AGG Q"
+	DRIVER "AGG/PNG"
+	MIMETYPE "image/png; mode=8bit"
+	IMAGEMODE RGB
+	EXTENSION "png"
+	TRANSPARENT ON
+	FORMATOPTION "INTERLACE=OFF"
+    FORMATOPTION "QUANTIZE_FORCE=ON"
+    FORMATOPTION "QUANTIZE_DITHER=OFF"
+    FORMATOPTION "QUANTIZE_COLORS=256"
+END
+
+END #MAP
