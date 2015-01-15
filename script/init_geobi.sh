@@ -11,6 +11,8 @@ chmod -R g+ws app/cache
 chgrp -R apache app/logs
 chmod -R g+ws app/logs
 
+mkdir src/R3gis/AppBundle/Resources/mapfile
+
 php script/author/replace_settings.php script/author/stat.map src/R3gis/AppBundle/Resources/mapfile/stat.map
 
 
