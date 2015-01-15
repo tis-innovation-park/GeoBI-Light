@@ -1,0 +1,17 @@
+/web/bundles/
+/app/bootstrap.php.cache
+/app/cache/*
+/app/config/parameters.yml
+/app/logs/*
+!app/cache/.gitkeep
+!app/logs/.gitkeep
+/build/
+/vendor/
+/bin/
+/composer.phar
+/src/_Acme/
+/web/_bundles/
+src/R3gis/AppBundle/Entity/*~
+setperm.sh
+src/R3gis/AppBundle/Resources/mapfile/stat.map
+composer.lock
