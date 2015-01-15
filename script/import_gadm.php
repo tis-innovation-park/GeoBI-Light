@@ -2,7 +2,7 @@
 
 $downloadPath = __DIR__ . '/../gadm-data/';
 $tmpPath = __DIR__ . '/../gadm-data/tmp/';
-$dsnArray = array('database'=>'geobi', 'hostspec'=>'192.168.0.84', 'username'=>'geobi', 'password'=>'geobi');
+$dsnArray = array('database'=>'geobi', 'hostspec'=>'127.0.0.1', 'username'=>'geobi', 'password'=>'geobi');
 
 $db = new PDO("pgsql:dbname={$dsnArray['database']};host={$dsnArray['hostspec']}", $dsnArray['username'], $dsnArray['password']);
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
