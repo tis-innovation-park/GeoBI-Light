@@ -27,7 +27,7 @@ $lines = file($configFilename);
 $codeList = array();
 foreach($lines as $line) {
     $line = trim($line);
-    if ($line == '' || $line[0] == '#') {
+    if ($line == '' || in_array($line[0], array('#', ';'))) {
         continue;
     }
     if (( $p = strpos($line, ' ')) === false) {
