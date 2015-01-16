@@ -1,4 +1,27 @@
 {
-    "500-0001": "Kann nicht auf cKan zugreifen.",
-  	"500-0002": "Die Datei %s wurde nicht gefunden."
+    "400-0001": "Kein Name angegeben.",
+    "400-0002": "Der Name ist zu kurz.",
+    "400-0003": "Kein Passwort angegeben.",
+    "400-0004": "Das Passwort ist zu kurz.",
+    "400-0005": "Email-Adresse fehlt.",
+    "400-0006": "Angegebene Email-Adresse ist ungültig.",
+    "400-0007": "Der Captcha-Text zum vergleichen fehlt.",
+    "400-0008": "Der angegebene Captcha-Text stimmt nicht überein.",
+    "400-0009": "Der Benutzer wurde noch nicht aktiviert.",
+    "400-0010": "Es gibt bereits einen Benutzer mit dieser Email.",
+    "400-0011": "Der Benutzer hat die Email-Validierung bereits ausgeführt.",
+    "400-0012": "Kein Hash angegeben.",
+    "400-0013": "Der angegebene Hash ist nicht gültig oder abgelaufen.",
+    "400-0014": "Keine ID angegeben.",
+    "400-0015": "Keine Benutzer-Änderungen angegeben.",
+    "400-0016": "Mindestens eine der Benutzer-Änderungen ist falsch.",
+   
+    "403-0001": "Sie sind nicht befugt auf diese Ressource zuzugreifen. Entweder Sie sind nicht eingeloggt, oder Sie haben nicht die notwendigen Berechtigungen.",
+    "403-0002": "Falsche Email/Passwort Kombination, oder der Benutzer wurde noch nicht aktiviert.",
+            
+    "404-0001": "Kein Benutzer mit dieser Email gefunden.",
+    "404-0002": "Kein Benutzer mit dieser ID gefunden.",
+    
+    "500-0008": "Can't access cKan.",
+    "500-0002": "File %s not found."
 }
