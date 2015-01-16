@@ -1013,7 +1013,7 @@ SELECT pg_catalog.setval('layer_type_lt_id_seq', 4, true);
 -- Data for Name: user; Type: TABLE DATA; Schema: geobi; Owner: geobi
 --
 
-INSERT INTO "user" (us_id, us_password, us_status, us_name, us_email, us_pw_last_change, us_last_ip, us_last_login, us_mod_user, us_mod_date, lang_id, gr_id, us_validation_hash, us_validation_hash_created_time, us_reset_password_hash, us_reset_password_hash_created_time) VALUES (1, NULL, 'E', 'admin', 'admin', NULL, NULL, NULL, 1, '2014-10-14 11:48:41', NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO "user" (us_id, us_password, us_status, us_name, us_email, us_pw_last_change, us_last_ip, us_last_login, us_mod_user, us_mod_date, lang_id, gr_id, us_validation_hash, us_validation_hash_created_time, us_reset_password_hash, us_reset_password_hash_created_time) VALUES (0, '$2y$12$ayjcGEVtuY36syesHwPU0esitvXP1/ZjQCaQJoP2PbjoQmD2Fb0GO', 'E', 'admin', 'admin@geobi', NULL, NULL, NULL, 1, NOW(), NULL, 1, NULL, NULL, NULL, NULL);
 
 
 --
