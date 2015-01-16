@@ -12,7 +12,9 @@ if (empty($argv[2])) {
 $templateFile = $argv[1];
 $destFile = $argv[2];
 $cfgFileName = realpath(__DIR__ . '/../../app/config/parameters.yml');
+@mkdir(__DIR__ . '/../../author');
 $authorPath = realpath(__DIR__ . '/../../author') . '/';
+@rmdir(__DIR__ . '/../../author');
 
 if (!file_exists($templateFile)) {
     echo "File {$templateFile} not found";
@@ -57,7 +59,6 @@ if ($parameters['database_driver'] != 'pdo_pgsql') {
 
 
 $content = file_get_contents($templateFile);
-
 foreach($parameters as $key=>$val) {
     $search = "[" . strtoupper($key) . "]";
     $content = str_replace($search, $val, $content);
