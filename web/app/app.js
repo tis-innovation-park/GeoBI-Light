@@ -445,6 +445,9 @@
                     authFactory.auth(res.result, token);
                     $state.go('homepage');
                 }
+            }).error(function(res){
+                alert('Error:\n' + res.result.error.text);
+                console.log(res);
             });
         };
 
@@ -1625,7 +1628,7 @@
                     });
                 }
                 
-                if(toState.name == 'map' || toState.name == 'users') {
+                if(toState.name == 'map' || toState.name == 'user') {
                     if (!storageFactory.load('setting-' + lang + toState.name)) {
                         apiFactory.getSetting(lang, toState.name).success(function(res){
                             if (res.success) {
