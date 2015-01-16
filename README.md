@@ -39,7 +39,10 @@ Change permission and ownership
 Download source of FreeGIS / GisClient from GitHub and install it on geobi directory. 
 You can change author setings in author/config/config.db.php and author/config/config.php
 
-    git clone https://github.com/gisclient/branch-3.2.git author
+    git clone https://github.com/gisclient/branch-3.2.git -n author
+    cd author
+    git checkout v3.2-0f7f2df
+    cd ../
     sudo sh script/init_gisclient.sh
     
 Configure apache 
@@ -101,5 +104,10 @@ Data are downloaded in gadm-data.
     php script/label_gadm.php
     
 INSTALLATION COMPLETED!
+
+Default login and password for administrator (change it!): 
+Login: admin
+Password: password
+
 
 go to http://maps.geobi.info.local/ and enjoy!
