@@ -21,10 +21,7 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "guzzlehttp/guzzle": "~5.0",
         "ircmaxell/password-compat": "~1.0.4",
-        "gregwar/captcha-bundle": "~1.0.12",
-        
-        "r3gis/common/fileexportbundle": "*@dev",
-        "r3gis/common/fileimportbundle": "*@dev"
+        "gregwar/captcha-bundle": "~1.0.12"
     },
     "scripts": {
         "post-install-cmd": [
