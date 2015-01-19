@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use R3gis\AppBundle\Entity\User;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use R3gis\AppBundle\ApiException;
+use R3gis\AppBundle\Exception\ApiException;
 
 /**
  * @Route("/user")
@@ -27,25 +27,25 @@ class RegisterController extends Controller {
         }
 
         if ( $request->request->get('name') == '')  {
-            throw new ApiException(400, "Missing name.");
+            throw new ApiException(400, "Missing name.", array('subCode'=>  ApiException::GEOBI_400_NAME_MISSING));
         }
         if ( strlen($request->request->get('name')) < 2)  {
-            throw new ApiException(400, "Name too short.");
+            throw new ApiException(400, "Name too short.", array('subCode'=>ApiException::GEOBI_400_NAME_TOOSHORT));
         }
         if( $request->request->get('password')==''){
-            throw new ApiException(400, 'Missing password.');
+            throw new ApiException(400, 'Missing password.', array('subCode'=>ApiException::GEOBI_400_PASSWORD_MISSING));
         }
         if( strlen($request->request->get('password'))<6){
-            throw new ApiException(400, 'Password too short.');
+            throw new ApiException(400, 'Password too short.', array('subCode'=>ApiException::GEOBI_400_PASSWORD_TOOSHORT));
         }
         if ( $request->request->get('email') == '')  {
-            throw new ApiException(400, "Missing email.");
+            throw new ApiException(400, "Missing email.", array('subCode'=>ApiException::GEOBI_400_EMAIL_MISSING));
         }
         if ( filter_var( $request->request->get('email'), FILTER_VALIDATE_EMAIL) === false)  {
-            throw new ApiException(400, "Invalid email.");
+            throw new ApiException(400, "Invalid email.", array('subCode'=>ApiException::GEOBI_400_EMAIL_INVALID));
         }
         if ( $request->request->get('captcha') == '' && !$this->get('security.context')->isGranted('ROLE_ADMIN'))  {
-            throw new ApiException(400, "Missing captcha.");
+            throw new ApiException(400, "Missing captcha.", array('subCode'=>ApiException::GEOBI_400_CAPTCHA_MISSING));
         }
         $captcha = $request->request->get('captcha');
         //validate Captcha
@@ -53,7 +53,7 @@ class RegisterController extends Controller {
         if(     !$this->get('security.context')->isGranted('ROLE_ADMIN') && 
                 (!$captcha || !$session->get("captcha") || $captcha !== $session->get("captcha"))
         ) {
-            throw new ApiException(400, 'Invalid Captcha.');
+            throw new ApiException(400, 'Invalid Captcha.', array('subCode'=>ApiException::GEOBI_400_CAPTCHA_INVALID));
         }
         //make sure it's usable only once
         $session->remove("captcha");
@@ -63,9 +63,9 @@ class RegisterController extends Controller {
         $user = $userRepo->findOneByEmail($request->request->get('email'));
         if ($user) {
             if ($user->getStatus() == 'W') { // SS: Where to put status?
-                throw new ApiException(400, "Email validation needed.");
+                throw new ApiException(400, "Email validation needed.", array('subCode'=>ApiException::GEOBI_400_VALIDATION_AWAITING));
             } else {
-                throw new ApiException(400, "Email already exists.");
+                throw new ApiException(400, "Email already exists.", array('subCode'=>ApiException::GEOBI_400_EMAIL_DUPLICATE));
             }    
         }
 
@@ -123,20 +123,20 @@ class RegisterController extends Controller {
 
         // Validate: SS: See Symfony validation
         if ( $email == '')  {
-            throw new ApiException(400, "Missing email");
+            throw new ApiException(400, "Missing email", array('subCode'=>ApiException::GEOBI_400_EMAIL_MISSING));
         }
         if ( filter_var( $email, FILTER_VALIDATE_EMAIL) === false)  {
-            throw new ApiException(400, "Invalid email");
+            throw new ApiException(400, "Invalid email", array('subCode'=>ApiException::GEOBI_400_EMAIL_INVALID));
         }
         if ( $captcha == '' && !$this->get('security.context')->isGranted('ROLE_ADMIN'))  {
-            throw new ApiException(400, "Missing captcha");
+            throw new ApiException(400, "Missing captcha", array('subCode'=>ApiException::GEOBI_400_CAPTCHA_MISSING));
         }
         //validate Captcha
         $session = $request->getSession();
         if(     !$this->get('security.context')->isGranted('ROLE_ADMIN') && 
                 (!$captcha || !$session->get("captcha") || $captcha !== $session->get("captcha"))
         ) {
-            throw new BadRequestHttpException('Invalid Captcha.');
+            throw new ApiException(400, 'Invalid Captcha.', array('subCode'=>ApiException::GEOBI_400_CAPTCHA_INVALID));
         }
         //make sure it's usable only once
         $session->remove("captcha");
@@ -145,11 +145,11 @@ class RegisterController extends Controller {
         $userRepo  = $this->getDoctrine()->getRepository('R3gisAppBundle:User');
         $user = $userRepo->findOneByEmail($email);
         if (!$user) {
-            throw new ApiException(404, "Email not found");
+            throw new ApiException(404, "Email not found", array('subCode'=>ApiException::GEOBI_404_EMAIL_NOTFOUND));
         }
 
         if ($user->getStatus() != 'W') { // SS: Where to put status?
-                throw new ApiException(400, "Email already confirmed");
+                throw new ApiException(400, "Email already confirmed", array('subCode'=>ApiException::GEOBI_400_EMAIL_ALREADYVALIDATED));
             }    
 
         $this->sendRegistrationMailToUser( $user );

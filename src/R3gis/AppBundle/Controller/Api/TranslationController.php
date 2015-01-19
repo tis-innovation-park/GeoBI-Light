@@ -14,7 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 class TranslationController extends Controller {
 
     /**
-     * @Route("/{lang}/{name}.json", requirements={"lang" = "en|it|de", "name" = "(homepage|app|user|map)[\-\w]*"}, methods = {"GET"}, name="r3gis.app.translation.list")
+     * @Route("/{lang}/{name}.json", requirements={"lang" = "en|it|de", "name" = "(homepage|app|user|map|login|signup|thankyou|logout|resetpassord)[\-\w]*"}, methods = {"GET"}, name="r3gis.app.translation.list")
      * @Cache(expires="+600 seconds", maxage="600", smaxage="600")
      */
     public function listAction(Request $request, $name, $lang) {

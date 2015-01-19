@@ -8,8 +8,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use R3gis\AppBundle\Entity\User;
+use R3gis\AppBundle\Exception\ApiException;
 
 /**
  * 
@@ -38,17 +38,17 @@ class ResetPasswordController extends Controller {
         $captcha = $json->captcha;
         
         if($email==null || trim($email)==='') {
-            throw new BadRequestHttpException('No email specified.');
+            throw new ApiException(ApiException::BAD_REQUEST,'No email specified.', array('subCode'=>  ApiException::GEOBI_400_EMAIL_MISSING));
         }
         if ( $captcha == '' && !$this->get('security.context')->isGranted('ROLE_ADMIN'))  {
-            throw new \Exception("Missing captcha");
+            throw new ApiException(ApiException::BAD_REQUEST, "Missing captcha", array('subCode'=>  ApiException::GEOBI_400_CAPTCHA_MISSING));
         }
         //validate Captcha
         $session = $request->getSession();
         if(     !$this->get('security.context')->isGranted('ROLE_ADMIN') && 
                 (!$captcha || !$session->get("captcha") || $captcha !== $session->get("captcha"))
         ) {
-            throw new BadRequestHttpException('Invalid Captcha.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Missing captcha", array('subCode'=>  ApiException::GEOBI_400_CAPTCHA_INVALID));
         }
         //make sure it's usable only once
         $session->remove("captcha");
@@ -60,7 +60,7 @@ class ResetPasswordController extends Controller {
         ;
 
         if($user==null) {
-            throw new NotFoundHttpException('No user with specified email found.');
+            throw new ApiException(ApiException::NOT_FOUND, "User with this email not found.", array('subCode'=>  ApiException::GEOBI_404_EMAIL_NOTFOUND));
         }
 
         $hash = md5(uniqid(mt_rand(), true));
@@ -119,7 +119,7 @@ class ResetPasswordController extends Controller {
     public function resetLinkAction(Request $request, $hash=null){
 
         if($hash==null || $hash==='') {
-            throw new BadRequestHttpException('Hash invalid.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash missing.", array('subCode'=>  ApiException::GEOBI_400_HASH_MISSING));
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -127,13 +127,12 @@ class ResetPasswordController extends Controller {
         $user = $userRepo->findOneByResetPasswordHash($hash);
 
         if($user==null || $user->getResetPasswordHashCreatedTime()==null) {
-            throw new NotFoundHttpException('Hash invalid or expired.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash invalid or expired.", array('subCode'=>  ApiException::GEOBI_400_HASH_INVALID));
         }
         if(time() - $user->getResetPasswordHashCreatedTime()->getTimestamp() > 3600*24) {
-            throw new NotFoundHttpException('Hash invalid or expired.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash invalid or expired.", array('subCode'=>  ApiException::GEOBI_400_HASH_INVALID));
         }
 
-        
         $response = new JsonResponse();
         $response->setStatusCode(200);
         $response->setData(
@@ -166,11 +165,14 @@ class ResetPasswordController extends Controller {
     public function changePasswordAction(Request $request, $hash=''){
         $json = json_decode($request->getContent());
         $password = $json->password;
-        if($hash==null || $hash==='' || $password==null || $password==='') {
-            throw new BadRequestHttpException('Hash invalid or no new password specified.');
+        if($hash==null || $hash==='' ) {
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash missing.", array('subCode'=>  ApiException::GEOBI_400_HASH_MISSING));
+        }
+        if($password==null || $password==='') {
+            throw new ApiException(ApiException::BAD_REQUEST, "Password missing.", array('subCode'=>  ApiException::GEOBI_400_PASSWORD_MISSING));
         }
         if(strlen($password)>6) {
-            throw new BadRequestHttpException('New password too short.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Password missing.", array('subCode'=>  ApiException::GEOBI_400_PASSWORD_TOOSHORT));
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -178,11 +180,11 @@ class ResetPasswordController extends Controller {
         $user = $userRepo->findOneByResetPasswordHash($hash);
 
         if($user==null || $user->getResetPasswordHashCreatedTime()==null) {
-            throw new NotFoundHttpException('Hash invalid or expired.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash invalid or expired.", array('subCode'=>  ApiException::GEOBI_400_HASH_INVALID));
         }
 
         if(time() - $user->getResetPasswordHashCreatedTime()->getTimestamp() > 3600*24) {
-            throw new NotFoundHttpException('Hash invalid or expired.');
+            throw new ApiException(ApiException::BAD_REQUEST, "Hash invalid or expired.", array('subCode'=>  ApiException::GEOBI_400_HASH_INVALID));
         }
 
         $encoder = $this->get('security.encoder_factory')->getEncoder($user);

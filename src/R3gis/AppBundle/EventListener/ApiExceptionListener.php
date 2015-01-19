@@ -58,20 +58,22 @@ class ApiExceptionListener {
         }
 
         // @TODO: get prefix from configuration
-        $routePrefix = 'r3gis.api';
-
+        $apiRouteRegexp = "/^(\/app_dev.php)?\/api\/.+$/";
+        
         $request = $event->getRequest();
-        $routeName = $request->get('_route');
+        $curPath = $request->getRequestUri();
 
-        if (preg_match("/^{$routePrefix}(.*)$/", $routeName) > 0) {
+        if (preg_match($apiRouteRegexp, $curPath) > 0) {
 
             $exception = $event->getException();
             $code = $exception->getCode();
+            $subCode = null;
             $message = $exception->getMessage();
 
             if ($exception instanceof ApiException) {
                 $options = $this->getExceptionOptions($exception);
                 $code = $exception->getStatusCode();
+                $subCode = $exception->getStatusSubCode();
             }
             if ($code <= 0) {
                 $code = 500;  // Internal server error
@@ -85,10 +87,11 @@ class ApiExceptionListener {
 
             $errorNode = array(
                 'code' => $code,
+                'subCode' => $subCode,
                 'text' => $message
             );
-            if (!empty($options)) {
-                $errorNode['params'] = $options;
+            if (!empty($options) && !empty($options['params'])) {
+                $errorNode['params'] = $options['params'];
             }
             if (!empty($trace)) {
                 $errorNode['trace'] = $trace;
@@ -107,5 +110,4 @@ class ApiExceptionListener {
             $event->setResponse($response);
         }
     }
-
 }

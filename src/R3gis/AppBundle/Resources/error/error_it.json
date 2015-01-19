@@ -1,4 +1,27 @@
 {
-    "500-0001": "Impossibile accedere a cKan",
-  	"500-0002": "File %s non trovato"
+    "400-0001": "IT:Name not specified.",
+    "400-0002": "IT:Name is too short.",
+    "400-0003": "IT:Password not specified.",
+    "400-0004": "IT:Password too short.",
+    "400-0005": "IT:Email not specified.",
+    "400-0006": "IT:Invalid Email specified.",
+    "400-0007": "IT:Captcha-Text not specified.",
+    "400-0008": "IT:Specified Captcha is invalid.",
+    "400-0009": "IT:User is still waiting for email-verification.",
+    "400-0010": "IT:There already is a user with that email.",
+    "400-0011": "IT:This user's email was already validated.",
+    "400-0012": "IT:No Hash specified.",
+    "400-0013": "IT:Specified hash is not valid or has expired.",
+    "400-0014": "IT:No ID specified.",
+    "400-0015": "IT:No user-changes specified.",
+    "400-0016": "IT:Invalid user-changes specified, has bad properties.",
+   
+    "403-0001": "IT:You are not allowed to access this resource. Either you are not logged in, or you don't have the required authorizations.",
+    "403-0002": "IT:Wrong Email and/or password, or your account still needs to be activated.",
+            
+    "404-0001": "IT:No user with that email was found.",
+    "404-0002": "IT:No user with that ID was found.",
+    
+    "500-0008": "Can't access cKan.",
+    "500-0002": "File %s not found."
 }

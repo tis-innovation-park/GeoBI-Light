@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use R3gis\AppBundle\Exception\ApiException;
 
 /**
  * @Route("/user")
@@ -46,7 +47,7 @@ class UserController extends Controller {
         $response = new JsonResponse();
 
         if (!$this->get('security.context')->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException();
+            throw new ApiException(ApiException::ACCESS_DENIED, "Access denied.", array('subCode'=>  ApiException::GEOBI_403_ACCESS_DENIED));
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -151,18 +152,18 @@ class UserController extends Controller {
         $response = new JsonResponse();
 
         if (!$this->get('security.context')->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException("Only Admins are allowed to delete users.");
+            throw new ApiException(ApiException::ACCESS_DENIED, "Access denied.", array('subCode'=>  ApiException::GEOBI_403_ACCESS_DENIED));
         }
 
         if($id==null || $id==='') {
-            throw new BadRequestHttpException('Invalid id specified');
+            throw new ApiException(ApiException::BAD_REQUEST, "No id specified.", array('subCode'=>  ApiException::GEOBI_400_ID_MISSING));
         }
 
         $em = $this->getDoctrine()->getManager();
         $userRepo = $em->getRepository('R3gisAppBundle:User');
         $user = $userRepo->findOneById($id);
         if($user == null) {
-            throw new NotFoundHttpException('Couldn\'t find any user with that id.');
+            throw new ApiException(ApiException::NOT_FOUND, "user not found.", array('subCode'=>  ApiException::GEOBI_404_ID_NOTFOUND));
         }
 
         $em->remove($user);
@@ -174,7 +175,7 @@ class UserController extends Controller {
     }
     
     /**
-     * @api {PUT} /user/{id}/  Modify user
+     * @api {PUT} /user/{id}  Modify user
      * @apiName modifyAction
      * @apiGroup user
      *
@@ -190,26 +191,25 @@ class UserController extends Controller {
         $response = new JsonResponse();
         
         if (!$this->get('security.context')->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException();
+            throw new ApiException(ApiException::ACCESS_DENIED, "Access denied.", array('subCode'=>  ApiException::GEOBI_403_ACCESS_DENIED));
         }
 
         $userchanges = json_decode($request->getContent());
 
-        if($id==null || $id==='' || $userchanges==null) {
-            throw new BadRequestHttpException('Invalid userid or userchanges specified');
+        if($id==null || $id==='') {
+            throw new ApiException(ApiException::BAD_REQUEST, "No id specified.", array('subCode'=>  ApiException::GEOBI_400_ID_MISSING));
+        }
+        if(empty($userchanges)) {
+            throw new ApiException(ApiException::BAD_REQUEST, "No userchanges specified.", array('subCode'=>  ApiException::GEOBI_400_USERCHANGES_MISSING));
         }
 
         $em = $this->getDoctrine()->getManager();
         $userRepo = $em->getRepository('R3gisAppBundle:User');
         $user = $userRepo->findOneById($id);
         if($user == null) {
-            throw new NotFoundHttpException('Couldn\'t find any user with that id.');
+            throw new ApiException(ApiException::NOT_FOUND, "user not found.", array('subCode'=>  ApiException::GEOBI_404_ID_NOTFOUND));
         }
         
-        if(empty($userchanges)){
-            throw new BadRequestHttpException('Invalid user object given');
-        }
-
         //Encode password
         if(property_exists($userchanges, "password")) {
             $encoder = $this->get('security.encoder_factory')->getEncoder($user);
@@ -254,7 +254,7 @@ class UserController extends Controller {
             if(method_exists($user, $method)) {
                 $user->$method($value);
             } else {
-                throw new BadRequestHttpException('Invalid property for userobject: '.$key);
+                throw new ApiException(ApiException::BAD_REQUEST, "Invalid property for userobject: '.$key", array('subCode'=>  ApiException::GEOBI_400_USERCHANGES_INVALID));
             }
         }
         $em->flush();
@@ -282,6 +282,13 @@ class UserController extends Controller {
         $response = new JsonResponse();
 
         $json = json_decode($request->getContent());
+        if($json== null ) {
+            throw new ApiException(
+                ApiException::ACCESS_DENIED, 
+                "Wrong Email and/or password, or you have not activated your account yet.", 
+                array('subCode'=>  ApiException::GEOBI_403_LOGIN_FAILED)
+            );
+        }
         $email = $json->email;
         $password = $json->password;
 
@@ -289,7 +296,11 @@ class UserController extends Controller {
         try {
             $user = $this->getDoctrine()->getRepository('R3gisAppBundle:User')->loadUserByUsername($email);
         } catch (UsernameNotFoundException $userNotFound) {
-            throw new AccessDeniedHttpException("Wrong Email and/or password.");
+            throw new ApiException(
+                ApiException::ACCESS_DENIED, 
+                "Wrong Email and/or password, or you have not activated your account yet.", 
+                array('subCode'=>  ApiException::GEOBI_403_LOGIN_FAILED)
+            );
         }
 
         $created = date('c');
@@ -327,7 +338,11 @@ class UserController extends Controller {
                     ),
             ));
         } catch (AuthenticationException $failed) {
-            throw new AccessDeniedHttpException("Wrong Email and/or password, or you have not activated your account yet.");
+            throw new ApiException(
+                ApiException::ACCESS_DENIED, 
+                "Wrong Email and/or password, or you have not activated your account yet.", 
+                array('subCode'=>  ApiException::GEOBI_403_LOGIN_FAILED)
+            );
         }
        
         return $response;

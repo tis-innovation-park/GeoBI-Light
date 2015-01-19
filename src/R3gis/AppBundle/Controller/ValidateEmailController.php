@@ -8,7 +8,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use R3gis\AppBundle\ApiException;
 
 class ValidateEmailController extends Controller {
 
@@ -23,22 +22,22 @@ class ValidateEmailController extends Controller {
         {
             $em = $this->getDoctrine()->getManager();
             if($hash==null) {
-                throw new ApiException(400, 'Hash invalid.');
+                throw new \Exception('Hash invalid.', 400);
             }
             
             $userRepo = $em->getRepository('R3gisAppBundle:User');
             $user = $userRepo->findOneByValidationHash($hash);
             
             if($user==null || $user->getValidationHashCreatedTime()==null) {
-                throw new ApiException(404, 'Hash invalid or expired.');
+                throw new \Exception('Hash invalid or expired.', 404);
             }
             
             if(time() - $user->getValidationHashCreatedTime()->getTimestamp() > 3600*24) {
-                throw new ApiException(404, 'Hash invalid or expired.');
+                throw new \Exception('Hash invalid or expired.', 404);
             }
             
             if($user->getStatus() !=='W'){
-                throw new ApiException(400, 'User is not waiting for Validation.');
+                throw new \Exception('User is not waiting for Validation.', 400);
             }
             
             $user->setStatus('E');

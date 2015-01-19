@@ -18,7 +18,6 @@ class MapStatController extends Controller {
     /**
      * @Route("/{hash}", methods = {"GET"}, name="r3gis.map.check")
      */
-    // SS: Only check if hash is valid
     public function checkAction(Request $request, $hash) {
 
         $em = $this->getDoctrine()->getManager();
@@ -40,7 +39,6 @@ class MapStatController extends Controller {
             return MS_LAYER_POINT;
         }
         $convesionArray = array(
-            //, , , MS_LAYER_RASTER, MS_LAYER_QUERY, MS_LAYER_CIRCLE, MS_LAYER_TILEINDEX, MS_LAYER_CHART
             'POINT' => MS_LAYER_POINT,
             'MULTIPOINT' => MS_LAYER_POINT,
             'LINESTRING' => MS_LAYER_LINE,
@@ -197,13 +195,9 @@ class MapStatController extends Controller {
         return $textPart;
     }
 
-    // SS: transform array to class
     private function addClass(\ms_layer_obj $layer, $layerType, $expressionText, array $opt) {
         $opt = array_merge(array('color' => null, 'outline_color' => null, 'opacity' => null, 'symbol' => 'circle', 'hightlight' => null), $opt);
-//echo "[$layerType]";die();
         $msLayerType = $this->getMSGeometryType($layerType);
-        // echo $layerType.$msLayerType; die();
-        // size_type
 
         if ($msLayerType == MS_LAYER_POINT) {
             $size = empty($opt['size']) ? 9 : $opt['size'];
@@ -228,10 +222,7 @@ class MapStatController extends Controller {
         $textPart = array_merge($textPart, $styleTextPart);
 
         $textPart[] = 'END';
-        // echo implode("\n", $textPart); die();
         $class->updateFromString(implode("\n", $textPart));
-        //print_r(  $class->getStyle(0) ); //setSymbol(2);
-        //die();
     }
 
     private function addNoDataClass(\ms_layer_obj $layer, $layerType, array $opt) {
@@ -249,7 +240,6 @@ class MapStatController extends Controller {
         if (!empty($expressionText)) {
             $textPart[] = "  EXPRESSION ({$expressionText})";
         }
-
         $textPart[] = "  STYLE";
         $textPart[] = "    COLOR {$msColor}";
         $textPart[] = "    OUTLINECOLOR {$msOutlineColor}";
@@ -257,7 +247,6 @@ class MapStatController extends Controller {
         $textPart[] = "    OPACITY {$opt['opacity']}";
         $textPart[] = "  END";
         $textPart[] = "END";
-        // echo implode("\n", $textPart); die();
         $class->updateFromString(implode("\n", $textPart));
     }
 
@@ -277,10 +266,8 @@ class MapStatController extends Controller {
 
     /**
      * @Route("/{hash}/stat/{order}", methods = {"GET"}, name="r3gis.map.wms_wrapper")
-     * #@Cache(expires="+600 seconds", maxage="600", smaxage="600")
      */
     public function statWmsAction(Request $request, $hash, $order) {
-        //echo $this->container->getParameter('base_url'); die();
         $kernel = $this->get('kernel');
         $mapfile = $kernel->locateResource('@R3gisAppBundle/Resources/mapfile/stat.map');
 
@@ -291,7 +278,6 @@ class MapStatController extends Controller {
 
         $mapInfo = $this->getMapLayerInfo($hash, $order);
         $highlight = (int) $request->query->get('HIGHLIGHT');
-        // print_r($mapInfo); die();
 
         if (!empty($mapInfo)) {
 
@@ -300,8 +286,6 @@ class MapStatController extends Controller {
             $connectionString = sprintf("host=%s dbname=%s user=%s password=%s port=%s", $this->container->getParameter('database_host'), $this->container->getParameter('database_name'), $this->container->getParameter('database_user'), $this->container->getParameter('database_password'), empty($dbPost) ? 5432 : $dbPost);
 
             $this->map = ms_newMapobj($mapfile);
-
-            //echo $this->map->getSymbolByName('TRIANGLE'); die();
 
             $objRequest = $this->setupRequest($request);
 
@@ -330,7 +314,6 @@ class MapStatController extends Controller {
                 $fields[] = 'the_geom';
                 $db = $this->getDoctrine()->getManager()->getConnection();
                 $sum = $db->query("SELECT COALESCE(SUM({$mapInfo['data_column']}), 0) FROM {$mapInfo['schema']}.{$mapInfo['table']}")->fetchColumn();
-                //$sum = $db->query("SELECT COALESCE(LOG(SUM({$mapInfo['data_column']})), 0) FROM {$mapInfo['schema']}.{$mapInfo['table']}")->fetchColumn();
 
                 $fields[] = "({$sum}) AS {$mapInfo['data_column']}_total";
             } else {
@@ -343,7 +326,6 @@ class MapStatController extends Controller {
             if (!empty($mapInfo['data_column'])) {
                 $fields[] = $mapInfo['data_column'];
             }
-            // print_R( $fields ); die();
             $fieldText = implode(', ', $fields);
             if ($mapInfo['is_shape']) {
                 $sql = "SELECT {$fieldText} FROM {$mapInfo['schema']}.{$mapInfo['table']}";
@@ -377,22 +359,13 @@ class MapStatController extends Controller {
                 $layer->setprocessing("CHART_SIZE={$w} {$h}");
                 $layer->setprocessing("CHART_TYPE=bar");
             }
-//echo $sql; die();
-
-
             $layer->set('data', "the_geom FROM ({$sql}) AS foo USING UNIQUE gid USING SRID={$mapInfo['srid']}");
 
-            // print_r($mapInfo);  die();
             $tot = count($mapInfo['class']);
-            //$count = 0;
             $lastValue = null;
             $i = 0;
 
-            // Punti di dimensione variabile
-            //print_r($mapInfo);
-            //die();
-            //echo $mapInfo['layer_type']; die();
-            // SS: Verificare presenza di dati
+            // Variable point size
             if ($mapInfo['ms_layer_type'] == 'pie' || $mapInfo['ms_layer_type'] == 'bar') {
                 if ($mapInfo['class'][0]['number'] > 0) {
                     $layer->setFilter("[{$mapInfo['data_column']} > {$mapInfo['class'][0]['number']}]");
@@ -413,7 +386,6 @@ class MapStatController extends Controller {
                         'offset' => $mapInfo['order'] * $mapInfo['min_size']));
                     break;
                 }
-                //echo $mapInfo['nodata_color']; die();
                 $opacity = $mapInfo['opacity'];
                 if ($mapInfo['layer_type'] == 'bar') {
                     $opacity = 0;
@@ -421,9 +393,8 @@ class MapStatController extends Controller {
                 $this->addChartClass($layer, "{$mapInfo['data_column']}_total", null, array(
                     'color' => $mapInfo['nodata_color'],
                     'outline_color' => $mapInfo['outline_color'],
-                    'opacity' => $opacity)); //$mapInfo['opacity']));
+                    'opacity' => $opacity));
             } else if ($mapInfo['ms_layer_type'] == 'point' && $mapInfo['size_type'] == 'variable') {
-                    //[min_size] => 4 [max_size]  class
                     $totClasses = count($mapInfo['class']);
                     $size = $mapInfo['min_size'];
                     $delta = abs($mapInfo['max_size'] - $mapInfo['min_size']) / ($totClasses - 1);
@@ -439,7 +410,6 @@ class MapStatController extends Controller {
                     }
                     
                     foreach ($mapInfo['class'] as $class) {
-                        //echo "[{$class['number']}|{$size}]";
                         $i++;
                         if ($i < $tot) {
                             $expression = $this->getNumberExpression($mapInfo['data_column'], $lastValue, $class['number']);
@@ -447,7 +417,6 @@ class MapStatController extends Controller {
                         } else {
                             $expression = $this->getNumberExpression($mapInfo['data_column'], $lastValue, null);
                         }
-                        //echo "$expression\n";
                         $this->addClass($layer, $mapInfo['ms_geomery_type'], $expression, array(
                             'color' => $color,
                             'outline_color' => $outlineColor,
@@ -456,10 +425,6 @@ class MapStatController extends Controller {
                             'size' => $size));
                         $size = round($size + $delta);
                     }
-                
-                    
-                
-                //die();
             } else {
                 if (!$highlight) {
                     foreach ($mapInfo['class'] as $class) {
@@ -470,12 +435,12 @@ class MapStatController extends Controller {
                         } else {
                             $expression = $this->getNumberExpression($mapInfo['data_column'], $lastValue, null);
                         }
-                        //echo "$expression\n";
                         $this->addClass($layer, $mapInfo['ms_geomery_type'], $expression, array(
                             'color' => $class['color'],
                             'outline_color' => $mapInfo['outline_color'],
                             'opacity' => $mapInfo['opacity'],
-                            'symbol' => $mapInfo['symbol']));
+                            'symbol' => $mapInfo['symbol'],
+                            'size' => $mapInfo['min_size']));
                     }
                     $this->addNoDataClass($layer, $mapInfo['ms_geomery_type'], array(
                         'color' => $mapInfo['nodata_color'],
@@ -487,7 +452,6 @@ class MapStatController extends Controller {
                     $opacity = $mapInfo['opacity'];
                     $opacity = 60;
                     $color = 'ffff00';
-                    //$color = null;
                     $this->addNoDataClass($layer, $mapInfo['ms_geomery_type'], array(
                         'color' => $color,
                         'outline_color' => null, //'FFFF00',
@@ -496,8 +460,6 @@ class MapStatController extends Controller {
                         'hightlight' => $highlight
                     ));
                 }
-
-                //die('fine');
             }
 
 
@@ -506,25 +468,23 @@ class MapStatController extends Controller {
 
             /* Eexecute request */
             $this->map->owsdispatch($objRequest);
-            $this->map->save('/tmp/geobi.map');
+            // $this->map->save('/tmp/geobi.map');
 
             $contenttype = ms_iostripstdoutbuffercontenttype();
-            //SS: SOLO IN MODO DEV: 
-            if (substr($contenttype, 0, 5) == 'image') {
-                header("Content-type: {$contenttype}");
-            }
-            //echo $contenttype; die();
-            //if (empty($_REQUEST['showerror'])) {
-            //  header('Content-type: image/png');
+            // ONLY IN DEV MODE
+            //if (substr($contenttype, 0, 5) == 'image') {
+            //    header("Content-type: {$contenttype}");
             //}
+            if (empty($_REQUEST['showerror'])) {
+              header('Content-type: image/png');
+            }
             ms_iogetStdoutBufferBytes();
 
             ms_ioresethandlers();
         } else {
-            // TODO: Draw an empty image(?)
+            // TODO: Draw an empty image
             die('No info');
         }
-
         die();
     }
 
