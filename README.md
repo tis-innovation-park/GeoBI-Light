@@ -62,8 +62,8 @@ and add at the end of the file
             Allow from all
         </Directory>
         DirectoryIndex index.htm index.html index.php
-        CustomLog /yourfolder/geobi/log/access_log combined
-        ErrorLog /yourfolder/geobi/log/error_log
+        # CustomLog /yourfolder/geobi/log/access_log combined
+        # ErrorLog /yourfolder/geobi/log/error_log
         # FreeGIS / GisClient configuration
         Alias /author/ /yourfolder/geobi/author/public/
     </VirtualHost>
