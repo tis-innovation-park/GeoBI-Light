@@ -21,7 +21,8 @@
         "incenteev/composer-parameter-handler": "~2.0",
         "guzzlehttp/guzzle": "~5.0",
         "ircmaxell/password-compat": "~1.0.4",
-        "gregwar/captcha-bundle": "~1.0.12"
+        "gregwar/captcha-bundle": "~1.0.12",
+        "phpoffice/phpexcel": "1.8.*"
     },
     "scripts": {
         "post-install-cmd": [
