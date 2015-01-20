@@ -31,11 +31,6 @@ Parameters to change (during composer install):
     database_name: geobi
     database_user: geobi
     database_password: geobi
-
-Change permission and ownership
-
-    sudo sh script/init_geobi.sh
-
     
 Download source of FreeGIS / GisClient from GitHub and install it on geobi directory. 
 You can change author setings in author/config/config.db.php and author/config/config.php
@@ -45,7 +40,11 @@ You can change author setings in author/config/config.db.php and author/config/c
     git checkout v3.2-0f7f2df
     cd ../
     sudo sh script/init_gisclient.sh
-    
+
+Change permission and ownership
+
+    sudo sh script/init_geobi.sh
+
 Configure apache 
 
 sudo vim /etc/httpd/conf/httpd.conf
@@ -105,10 +104,6 @@ Data are downloaded in gadm-data.
     php script/download_gadm.php
     php script/import_gadm.php
     php script/label_gadm.php
-
-Change some directory permission
-    chown -R apache:apache app/cache
-    chown -R apache:apache app/logs
     
 INSTALLATION COMPLETED!
 
