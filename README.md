@@ -16,7 +16,7 @@ using Symfony
 2) Installation
 ----------------------------------
 
-### Download from git (BitBucket)
+### Download from git
 
 Download source of GeoBI from GitHub and installing
 We assume that the web server user is "apache", and the server name is http://maps.geobi.info.local/
@@ -71,7 +71,7 @@ and add at the end of the file
 Create the database. The "geobi" user is a low-privileges user (no superuser, no create databases, no more new roles). 
 Set your password same as the user name
 
-    sudo su - postgres
+    sudo su postgres
     
     ; Create users
     createuser geobi            ; Low privileges users
@@ -92,8 +92,10 @@ Set your password same as the user name
     psql -h127.0.0.1 -U geobi geobi < sql/CreateEmptyDatabase.sql
     
     ; Add unaccent extension with postgres privileged user 
-    su postgres
-    psql -U<privileged_user> -h 127.0.0.1 geobi -c "CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public"
+    psql geobi -c "CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public"
+
+    ; Return to normal user
+    exit
 
 Download gadm data, import and check it. 
 This may take some hours, depends on your internet connection and hardware.
@@ -102,11 +104,15 @@ Data are downloaded in gadm-data.
     php script/download_gadm.php
     php script/import_gadm.php
     php script/label_gadm.php
+
+Change some directory permission
+    chown -R apache:apache app/cache
+    chown -R apache:apache app/logs
     
 INSTALLATION COMPLETED!
 
 Default login and password for administrator (change it!): 
-Login: admin
+Login: admin@geobi
 Password: password
 
 

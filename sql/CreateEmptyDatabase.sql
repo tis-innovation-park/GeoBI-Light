@@ -1423,7 +1423,7 @@ REVOKE ALL ON TABLE area_type FROM PUBLIC;
 REVOKE ALL ON TABLE area_type FROM geobi;
 GRANT ALL ON TABLE area_type TO geobi;
 
-
+SET search_path = public, pg_catalog;
 SELECT AddGeometryColumn ('data','area','the_geom',3857,'MULTIPOLYGON', 2);
 CREATE INDEX area_the_geom_gist ON data.area USING gist(the_geom);
 ALTER TABLE data.area CLUSTER ON area_the_geom_gist;
