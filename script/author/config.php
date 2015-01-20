@@ -27,7 +27,7 @@ define('GC_SESSION_NAME', 'GEOBI');
 ini_set('max_execution_time',90);
 ini_set('memory_limit','512M');
 
-error_reporting  (E_ALL & ~E_SCRICT);
+error_reporting  (E_ALL & ~E_STRICT);
 ini_set('display_errors', 'On');
 
 define('LONG_EXECUTIONE_TIME',300);
