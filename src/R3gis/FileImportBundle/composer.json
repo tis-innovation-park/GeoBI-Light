@@ -1,0 +1,29 @@
+{
+    "name": "r3gis/common/fileimportbundle",
+    "type": "symfony-bundle",
+    "description": "Import driver's for various formats",
+    "keywords": ["import", "bundle"],
+    "homepage": "http://www.r3.gis.com",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Peter Hopfgartner",
+            "email": "peter.hopfgartner@company.com"
+        }, {
+            "name": "Daniel Degasperi",
+            "email": "daniel.degasperi@r3-gis.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "phpoffice/phpexcel": "1.8.*"
+    },
+    
+    "require-dev": {
+        "symfony/framework-bundle": ">=2.3"
+    },
+    "autoload": {
+        "psr-4": { "R3Gis\\Common\\FileImportBundle\\": "" }
+    },
+    "minimum-stability": "dev"
+}
