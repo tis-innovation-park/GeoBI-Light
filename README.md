@@ -33,6 +33,7 @@ Parameters to change (during composer install):
     database_password: geobi
 
 Change permission and ownership
+
     sudo sh script/init_geobi.sh
 
     
