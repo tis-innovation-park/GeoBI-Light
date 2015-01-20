@@ -380,7 +380,7 @@
             ];
             apiFactory.saveCorrectData(hash, order, data).success(function(res) {
                 if (res.success) {
-                    console.log(res);
+                    //console.log(res);
                 }
             }).error(function(res){
                 alert('Error:\n' + res.result.error.text);
@@ -767,7 +767,6 @@
                             map.removeLayer(layer);
                             window.clearInterval(opacityI);
                         } else {
-                            console.log(layer.opacity);
                             layer.setOpacity(layer.opacity - 0.05);
                         }
                 }, 50);
