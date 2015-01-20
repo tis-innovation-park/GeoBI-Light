@@ -4,9 +4,9 @@ namespace R3gis\AppBundle\Ckan;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOException;
-use R3Gis\Common\FileImportBundle\Drivers\Csv;
-use R3Gis\Common\FileImportBundle\Drivers\Xls;
-use R3Gis\Common\FileImportBundle\Drivers\Shp;
+use R3gis\FileImportBundle\Drivers\Csv;
+use R3gis\FileImportBundle\Drivers\Xls;
+use R3gis\FileImportBundle\Drivers\Shp;
 use R3gis\AppBundle\Utils\DefaultsUtils;
 use R3gis\AppBundle\Ckan\CkanDataAnalyzerUtils;
 use R3gis\AppBundle\Entity\Map;

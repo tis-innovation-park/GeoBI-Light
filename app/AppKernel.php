@@ -17,7 +17,7 @@ class AppKernel extends Kernel
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new R3gis\AppBundle\R3gisAppBundle(),
-            new R3Gis\Common\FileExportBundle\R3GisCommonFileExportBundle(),
+            new R3gis\FileImportBundle\R3gisFileImportBundle(),
             new Gregwar\CaptchaBundle\GregwarCaptchaBundle(),
         );
         

@@ -1,10 +1,10 @@
 parameters:
-    database_driver:   pdo_mysql
+    database_driver:   pdo_pgsql
     database_host:     127.0.0.1
     database_port:     ~
-    database_name:     symfony
-    database_user:     root
-    database_password: ~
+    database_name:     geobi
+    database_user:     geobi
+    database_password: geobi
     # You should uncomment this if you want use pdo_sqlite
     # database_path: "%kernel.root_dir%/data.db3"
 
@@ -16,6 +16,6 @@ parameters:
     locale:            en
     secret:            ThisTokenIsNotSoSecretChangeIt
     
-    base_url:          http://maps.geobi.info/
-    author_url:        http://maps.geobi.info/author/
+    base_url:          http://maps.geobi.info.local/
+    author_url:        http://maps.geobi.info.local/author/
     srid:              3857
