@@ -1,7 +1,7 @@
 {
     "languages" : [
-        { "key": "en", "value": "DE:English" },
-        { "key": "de", "value": "DE:Deutsch" },
-        { "key": "it", "value": "DE:Italiano" }
+        { "key": "en", "value": "Englisch" },
+        { "key": "de", "value": "Deutsch" },
+        { "key": "it", "value": "Italienisch" }
     ]
 }

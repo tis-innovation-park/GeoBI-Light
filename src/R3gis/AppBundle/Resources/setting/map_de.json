@@ -2,7 +2,6 @@
     "background": {
         "source": {
             "options": [
-                { "key": "none", "value": "DE:Nessuno" },
                 { "key": "osm", "value": "OpenStreetMap" }
             ]
         }
@@ -10,21 +9,20 @@
     "statistic": {
         "type": {
             "options": [
-                { "key": "fill", "value": "DE: Pieno" },
-                { "key": "point", "value": "DE: Punkt" }
+                { "key": "fill", "value": "Voll" },
+                { "key": "point", "value": "Punkt" }
             ]
         },
         "sizeType": {
             "options": [
-                { "key": "fixed", "value": "DE: fixed" },
-                { "key": "variable", "value": "DE: variable" }
+                { "key": "fixed", "value": "fix" },
+                { "key": "variable", "value": "variabel" }
             ]
         },
         "divisionType": {
             "options": [
-                { "key": "manual", "value": "DE: manual" },
-                { "key": "natural", "value": "DE: natural" },
-                { "key": "quantile-round", "value": "DE: quantile-round" }
+                { "key": "natural", "value": "natürlich" },
+                { "key": "quantile-round", "value": "abgerundete Quantile" }
             ]
         },
         "divisionNumber": {
