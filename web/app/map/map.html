@@ -8,7 +8,7 @@
                     <button ng-click="map.openPanel()" class="open-panel clear-button"><li><i class="fa fa-chevron-left fa-lg"></i></li></button>
                     <li title="{{$root.text.map.tip_stampa}}" ng-click="map.print()"><i class="fa fa-print fa-lg"></i></li>
                     <li title="{{$root.text.map.tip_condividi}}" ng-click="map.shareToSocial()"><i class="fa fa-share-alt fa-lg"></i></li>
-                    <li title="{{$root.text.map.tip_download}}" ng-click="map.download()"><i class="fa fa-download fa-lg"></i></li>
+                    <li title="{{$root.text.map.tip_download}}" ng-click="map.download()"><iframe id="iframe_download" style="display:none"></iframe><i class="fa fa-download fa-lg"></i></li>
                     <li title="Zoom su mappa" ng-click="map.zoomToExtent(map.data.extent)"><i class="fa fa-dot-circle-o fa-lg"></i></li>
                     <!-- <li><i class="fa fa-heart fa-lg"></i></li> -->
                 </ul>
