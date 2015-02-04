@@ -72,6 +72,12 @@ class CkanController extends Controller {
 
         $kernel = $this->get('kernel');
         $cachePath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment();
+        $tempPath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment() . '/tmp/';
+        
+        $fs = new Filesystem();
+        if (!$fs->exists($tempPath)) {
+            $fs->mkdir($tempPath);            
+        }
 
         //$ckanPackage = $request->query->get('package');
         //$ckanId = $request->query->get('id');
@@ -86,7 +92,7 @@ class CkanController extends Controller {
 
         if (!$ckanCache->hasValidEntry($package, $id, $data['last_modified'])) {
             list($format, $isZip) = $ckan->getDataFormat($package, $id);
-            $destFile = '/tmp/ckan_' . date('Ymd_His') . '-' . md5(microtime(true) + rand(0, 65535)) . ".{$format}";
+            $destFile = "{$tempPath}ckan_" . date('Ymd_His') . '-' . md5(microtime(true) + rand(0, 65535)) . ".{$format}";
             if ($isZip) {
                 $destFile = "{$destFile}.zip";
             }
@@ -103,7 +109,6 @@ class CkanController extends Controller {
 
             $this->importFile($destFile, $destTable, $package, $id, $data['last_modified']);
 
-            $fs = new Filesystem();
             $fs->remove($destFile);
         }
 
@@ -182,6 +187,9 @@ class CkanController extends Controller {
         $table = null;
         foreach($data as $headerDef) {
             $table = "{$headerDef['it_schema']}.{$headerDef['it_table']}";
+            if ($headerDef['it_is_shape'] && in_array($headerDef['itd_column'], array('gid', 'the_geom'))) {
+                continue;
+            }
             $headers[] = array(
                 'code'=>$headerDef['itd_column'],
                 'name'=>$headerDef['itd_name'],
@@ -460,8 +468,12 @@ class CkanController extends Controller {
 
         // Asynchronous transaction
         $db->exec("SET LOCAL synchronous_commit TO OFF");
+        
+        $kernel = $this->get('kernel');
+        $tempPath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment() . '/tmp/';
 
         $opt = array(
+            'temp_path' => $tempPath,
             'database_driver' => $this->container->getParameter('database_driver'),
             'database_host' => $this->container->getParameter('database_host'),
             'database_port' => $this->container->getParameter('database_port'),
@@ -552,7 +564,7 @@ class CkanController extends Controller {
         $srid = $db->query("SELECT st_srid(the_geom) FROM {$fqDestTable} LIMIT 1")->fetchColumn();
         $sql = "ALTER TABLE {$fqDestTable} DROP CONSTRAINT IF EXISTS enforce_srid_the_geom";
         $db->exec($sql);
-        if ($srid == -1) {
+        if ($srid <= 0) {
             $done = false;
             foreach ($defaultsSrid as $srid) {
                 try {
