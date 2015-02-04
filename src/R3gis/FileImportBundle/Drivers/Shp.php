@@ -189,7 +189,7 @@ class Shp implements Driver {
     }
 
     public function shp2sql($destinationTable) {
-
+        
         $this->log(\Psr\Log\LogLevel::DEBUG, "Dumping shapefile \"{$this->filename}\" into \"{$this->options['temp_dir']}\"");
 
         $fs = new Filesystem();
@@ -351,7 +351,9 @@ class Shp implements Driver {
 
         $cmdOpt = array();
         $cmdOpt[] = "-h {$this->databaseHost}";
-        $cmdOpt[] = "-p {$this->databasePort}";
+        if(!empty($this->databasePort)) {
+            $cmdOpt[] = "-p {$this->databasePort}";
+        }    
         $cmdOpt[] = "-d {$this->databaseName}";
         $cmdOpt[] = "-f " . escapeshellarg($sqlFilename);
         $cmdOpt[] = "--set=ON_ERROR_STOP=1";  // force psql to return error (on error)
@@ -371,6 +373,7 @@ class Shp implements Driver {
         $startTime = microtime(true);
 
         exec($cmd, $outOutFile, $retVal);
+        
         $totTime = $start = microtime(true) - $startTime;
         $this->log(\Psr\Log\LogLevel::DEBUG, sprintf("Execution time: %.1f sec", $totTime));
 
@@ -381,7 +384,7 @@ class Shp implements Driver {
             $fs->remove($outErrFileName);
         }
         if ($retVal <> 0) {
-            $errorText = "psq return {$retVal}\nCommand was:\n{$cmd}";
+            $errorText = "psql return {$retVal}\nCommand was:\n{$cmd}";
             $this->log(\Psr\Log\LogLevel::DEBUG, $errorText);
             throw new \Exception($errorText);
         }
