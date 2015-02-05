@@ -38,6 +38,7 @@ class MapPreviewController extends Controller {
         $kernel = $this->get('kernel');
         $cachePath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment() . '/preview/';
         $extentRequest = $request->query->get('extent');
+        $isDownload = $request->query->get('download') !== null;
         
         $fs = new Filesystem();
         if (!$fs->exists($cachePath)) {
@@ -152,7 +153,14 @@ class MapPreviewController extends Controller {
             $defaultPreview = $kernel->locateResource('@R3gisAppBundle/Resources/images/default_preview.png');
             $image = file_get_contents($defaultPreview);
         }
-        return new Response($image, 200, array('Content-Type' => 'image/png'));
+        if ($isDownload) {
+            $mapName = $map->getName();
+            $mapName = mb_convert_encoding( $mapName, 'ISO-8859-1', 'UTF-8');
+            $mapName = str_replace(array('"', "'", '?', '*'), '_', $mapName);
+            return new Response($image, 200, array('Content-Type' => 'image/png', 'Content-Disposition' => sprintf('attachment; filename="%s"', "{$mapName}.png")));
+        } else {
+            return new Response($image, 200, array('Content-Type' => 'image/png'));
+        }    
     }
 
     // SS: Move to utility class (Used by MapController)
