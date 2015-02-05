@@ -202,7 +202,8 @@ class MapStatController extends Controller {
 
         if ($msLayerType == MS_LAYER_POINT) {
             $size = empty($opt['size']) ? 9 : $opt['size'];
-            $styleTextPart = $this->getPointStyleText($opt['color'], $opt['outline_color'], $opt['symbol'], $size, $opt['opacity']);
+            $symbol = empty($opt['symbol']) ? 'circle' : $opt['symbol'];
+            $styleTextPart = $this->getPointStyleText($opt['color'], $opt['outline_color'], $symbol, $size, $opt['opacity']);
         } else if ($msLayerType == MS_LAYER_LINE) {
             $styleTextPart = $this->getLineStyleText($opt['color'], $opt['outline_color'], 3, $opt['opacity']);
         } else {
