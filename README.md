@@ -8,22 +8,27 @@ using Symfony
 
 1) Requirements
 
- - Linux server (CentOS 6) with Apache >= 2.2
- - PHP >= 5.3.3
- - MapServer  >= 5.6 with PHP MapScript
- - PostgreSQL >= 9.1 with PostGis >= 1.5
+ - Linux server (CentOS 7) with Apache >= 2.4
+ - PHP >= 5.4
+ - MapServer  >= 6.4 with PHP MapScript
+ - PostgreSQL >= 9.3 with PostGis >= 2.1
+ - PostgreSQL contrib
+ - Postgis-client
+ - Git
+ - proj-epsg
  
 2) Installation
 ----------------------------------
 
 ### Download from git
 
-Download source of GeoBI from GitHub and installing
-We assume that the web server user is "apache", and the server name is http://maps.geobi.info.local/
+Download source of GeoBI from GitHub and install it
+We assume that the web server user is "apache", and the server name is http://maps.geobi.info/
 
-    git clone https://github.com/tis-innovation-park/GeoBI-Light.git geobi
+    git clone https://github.com/tis-innovation-park/GeoBI-Light.git geobi 
     cd geobi
-    composer install
+    curl -sS https://getcomposer.org/installer | php
+    ./composer.phar install
 
 Parameters to change (during composer install): 
 
@@ -31,6 +36,7 @@ Parameters to change (during composer install):
     database_name: geobi
     database_user: geobi
     database_password: geobi
+    database_port:5432
     
 Download source of FreeGIS / GisClient from GitHub and install it on geobi directory. 
 You can change author setings in author/config/config.db.php and author/config/config.php
@@ -84,8 +90,8 @@ Set your password same as the user name
     
     ; Initializing postgis database
     createlang plpgsql geobi
-    psql geobi < /usr/pgsql-9.1/share/contrib/postgis-1.5/postgis.sql
-    psql geobi < /usr/pgsql-9.1/share/contrib/postgis-1.5/spatial_ref_sys.sql
+    psql geobi < /usr/pgsql-9.3/share/contrib/postgis-2.1/postgis.sql
+    psql geobi < /usr/pgsql-9.3/share/contrib/postgis-2.1/spatial_ref_sys.sql
     psql geobi < sql/SetPostgisPermission.sql
     
     ; Importing the empty database
@@ -112,4 +118,4 @@ Login: admin@geobi
 Password: password
 
 
-go to http://maps.geobi.info.local/ and enjoy!
+go to http://maps.geobi.info/ and enjoy!
