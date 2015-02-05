@@ -35,6 +35,7 @@ class MapStatController extends Controller {
      * @param string $geometryType
      */
     private function getMSGeometryType($geometryType) {
+
         if ($geometryType == 'point') {
             return MS_LAYER_POINT;
         }
@@ -63,7 +64,7 @@ class MapStatController extends Controller {
                 INNER JOIN geobi.map_layer l ON m.map_id=l.map_id
                 INNER JOIN geobi.layer_type lt ON l.lt_id=lt.lt_id
                 LEFT JOIN data.area_type at ON l.at_id=at.at_id
-                LEFT JOIN public.geometry_columns g ON ml_is_shape IS TRUE and f_table_catalog='' AND f_table_schema=ml_schema and f_table_name=ml_table and f_geometry_column='the_geom'
+                LEFT JOIN public.geometry_columns g ON ml_is_shape IS TRUE AND f_table_schema=ml_schema and f_table_name=ml_table and f_geometry_column='the_geom'
                 WHERE map_hash=:map_hash AND ml_order=:ml_order";
         $stmt = $db->prepare($sql);
         $stmt->execute(array('map_hash' => $hash, 'ml_order' => $order));
@@ -195,7 +196,7 @@ class MapStatController extends Controller {
         return $textPart;
     }
 
-    private function addClass(\ms_layer_obj $layer, $layerType, $expressionText, array $opt) {
+    private function addClass($layer, $layerType, $expressionText, array $opt) {
         $opt = array_merge(array('color' => null, 'outline_color' => null, 'opacity' => null, 'symbol' => 'circle', 'hightlight' => null), $opt);
         $msLayerType = $this->getMSGeometryType($layerType);
 
@@ -225,11 +226,11 @@ class MapStatController extends Controller {
         $class->updateFromString(implode("\n", $textPart));
     }
 
-    private function addNoDataClass(\ms_layer_obj $layer, $layerType, array $opt) {
+    private function addNoDataClass($layer, $layerType, array $opt) {
         $this->addClass($layer, $layerType, null, $opt);
     }
 
-    private function addChartClass(\ms_layer_obj $layer, $dataColumn, $expressionText, array $opt) {
+    private function addChartClass($layer, $dataColumn, $expressionText, array $opt) {
         $opt = array_merge(array('color' => null, 'outline_color' => null, 'opacity' => null, 'offset' => 0), $opt);
 
         $class = ms_newClassObj($layer);
@@ -359,6 +360,7 @@ class MapStatController extends Controller {
                 $layer->setprocessing("CHART_SIZE={$w} {$h}");
                 $layer->setprocessing("CHART_TYPE=bar");
             }
+            
             $layer->set('data', "the_geom FROM ({$sql}) AS foo USING UNIQUE gid USING SRID={$mapInfo['srid']}");
 
             $tot = count($mapInfo['class']);
@@ -395,6 +397,7 @@ class MapStatController extends Controller {
                     'outline_color' => $mapInfo['outline_color'],
                     'opacity' => $opacity));
             } else if ($mapInfo['ms_layer_type'] == 'point' && $mapInfo['size_type'] == 'variable') {
+                
                     $totClasses = count($mapInfo['class']);
                     $size = $mapInfo['min_size'];
                     $delta = abs($mapInfo['max_size'] - $mapInfo['min_size']) / ($totClasses - 1);
@@ -469,6 +472,7 @@ class MapStatController extends Controller {
             /* Eexecute request */
             $this->map->owsdispatch($objRequest);
             // $this->map->save('/tmp/geobi.map');
+
 
             $contenttype = ms_iostripstdoutbuffercontenttype();
             // ONLY IN DEV MODE

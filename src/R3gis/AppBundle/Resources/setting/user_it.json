@@ -2,15 +2,15 @@
     "user": {
         "roles": {
             "options": [
-                { "key": "ADMIN", "value": "IT: Amministratore" },
-                { "key": "MAP_PRODUCER", "value": "IT: map Producer" }
+                { "key": "admin", "value": "Amministratore" },
+                { "key": "map_producer", "value": "Creatore di mappe" }
             ]
         },
         "status": {
             "options": [
-                { "key": "W", "value": "IT: Waiting for Validation" },
-                { "key": "E", "value": "IT: Enabled" },
-                { "key": "D", "value": "IT: Disabled" }
+                { "key": "W", "value": "In attesa di validazione" },
+                { "key": "E", "value": "Attivo" },
+                { "key": "D", "value": "Disattivato" }
             ]
         }
     }

@@ -669,13 +669,30 @@
         };
 
         controller.download = function() {
-            apiFactory.downloadMap(controller.setting.baseUrl, controller.currentHash, map.calculateBounds().toBBOX()).success(function(res) {
+            //apiFactory.downloadMap(controller.setting.baseUrl, controller.currentHash, map.calculateBounds().toBBOX()).success(function(res) {
                 //console.log(res);
-                document.location = 'data:image/png,' + encodeURIComponent(res);
-            }).error(function(res){
-                alert('Error:\n' + res.result.error.text);
-                console.log(res);
-            });
+                var canvas = document.createElement('CANVAS'),
+                    ctx = canvas.getContext('2d'),
+                    img = new Image;
+                img.crossOrigin = 'Anonymous';
+                img.onload = function(){
+                    var dataURL;
+                    canvas.height = img.height;
+                    canvas.width = img.width;
+                    ctx.drawImage(img, 0, 0);
+                    dataURL = canvas.toDataURL('image/png');
+                    var download = document.createElement('a');
+                    download.href = dataURL;
+                    download.target = '_blank';
+                    download.click();
+                    canvas = null; 
+                };
+                img.src = controller.setting.baseUrl + 'map/stat/' + controller.currentHash +'/800/1024/preview.png?extent=' + map.calculateBounds().toBBOX();
+                
+            // }).error(function(res){
+            //     alert('Error:\n' + res.result.error.text);
+            //     console.log(res);
+            // });
         };
 
         controller.editDataLayer = function(i) {

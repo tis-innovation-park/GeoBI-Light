@@ -700,7 +700,7 @@ class MapController extends Controller {
                 INNER JOIN geobi.map_layer l ON m.map_id=l.map_id
                 INNER JOIN geobi.layer_type lt ON l.lt_id=lt.lt_id
                 LEFT JOIN data.area_type at ON l.at_id=at.at_id
-                LEFT JOIN public.geometry_columns g ON ml_is_shape IS TRUE and f_table_catalog='' AND f_table_schema=ml_schema and f_table_name=ml_table and f_geometry_column='the_geom'
+                LEFT JOIN public.geometry_columns g ON ml_is_shape IS TRUE AND f_table_schema=ml_schema and f_table_name=ml_table and f_geometry_column='the_geom'
                 WHERE map_hash=:map_hash AND ml_order=:ml_order";
         $stmt = $db->prepare($sql);
         $stmt->execute(array('map_hash' => $hash, 'ml_order' => $order));
