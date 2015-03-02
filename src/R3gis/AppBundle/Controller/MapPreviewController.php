@@ -36,12 +36,15 @@ class MapPreviewController extends Controller {
     public function mapPreviewAction(Request $request, $hash, $width, $height) {
 
         $kernel = $this->get('kernel');
+        $logger = $this->get('logger');
         $cachePath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment() . '/preview/';
         $extentRequest = $request->query->get('extent');
         $isDownload = $request->query->get('download') !== null;
+        $logger->error("MAP-PREVIEW START [NO ERROR]");
         
         $fs = new Filesystem();
         if (!$fs->exists($cachePath)) {
+            $logger->info("Creating cache path {$cachePath}");
             $fs->mkdir($cachePath);
         }
         
@@ -60,9 +63,9 @@ class MapPreviewController extends Controller {
                 $d = new \DateTime();
                 $fileDate = $d->setTimestamp ( filemtime ( $cacheFile ));
             }
-            
             if (empty($fileDate) || $fileDate < $map->getModDate() || !empty($extentRequest)) {
                 // Empty or old cache
+                $logger->info("Generating preview map");
                 
                 //take extent from request if avalaible, else multiple fallbacks.
                 if(!empty($extentRequest)) {
@@ -81,24 +84,40 @@ class MapPreviewController extends Controller {
 
                 $httpClient = new Client();
                 $url = $this->container->getParameter('author_url') . 'services/download.php';
-
+                $logger->info("Getting preview from {$url}");
+                
                 $params = array();
 
                 $httpRequest = $httpClient->createRequest('POST', $url);
                 $postBody = $httpRequest->getBody();
 
                 $postBody->setField('viewport_size[0]', $width);
+                //$logger->debug("viewport_size[0]={$width}");
+                
                 $postBody->setField('viewport_size[1]', $height);
+                //$logger->debug("viewport_size[1]={$height}");
+                
                 $postBody->setField('format', 'png');
+                //$logger->debug("format=png");
+                
                 $postBody->setField('extent', "{$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
+                //$logger->debug("extent[1]={$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
+                
                 $postBody->setField('dpi', '96');
+                //$logger->debug("dpi=96");
+                
                 $postBody->setField('srid', 'EPSG:3857');
+                //$logger->debug("srid=EPSG:3857");
+                
                 $postBody->setField("scalebar", '');  // Prevent scale bar to generate 
+                //$logger->debug("scalebar=");                
 
                 $layerNo = 0;
                 foreach ($this->getMapLayers($map) as $layer) {
                     
                     $wmsUrl = $this->container->getParameter('base_url') . "map/stat/{$hash}/stat/{$layer['order']}";
+                    $logger->debug("wms layer: {$wmsUrl}");
+                    
                     $postBody->setField("tiles[{$layerNo}][url]", $wmsUrl);
                     $postBody->setField("tiles[{$layerNo}][parameters][SERVICE]", 'WMS');
                     $postBody->setField("tiles[{$layerNo}][parameters][VERSION]", '1.1.1');
@@ -119,8 +138,10 @@ class MapPreviewController extends Controller {
                 $reason = $httpResponse->getReasonPhrase();
 
                 $httpResponse->getBody();
-
+                
                 //echo "Response: {$code} {$reason}\n<br>\n";
+                $logger->debug("Response: {$code} {$reason}");
+                
                 $responseBody = $httpResponse->getBody();
 
                 if ($code == 200) {
@@ -135,24 +156,30 @@ class MapPreviewController extends Controller {
                         
                         //dont save to cache when extent was specified in request.
                         if(empty($extentRequest)){
+                            $logger->info("Cache image to {$cacheFile}");
                             file_put_contents($cacheFile, $image);
                         }
+                    } else {
+                        $logger->info("Server response: " . print_r($responseJson, true));
                     }
+                } else {
+                    $logger->info("Invalid response [{$code}]: No image generated");
                 }
             } else {
                 // Cache present and update
+                $logger->info("Returning image from cache ({$cacheFile})");
                 $image = file_get_contents($cacheFile);
             }
         } catch (\Exception $e) {
-            // @TODO: Log error
-            echo $e->getMessage();
+            $logger->error( $e->getMessage() );
             die();
         }
         if (empty($image)) {
-            $kernel = $this->get('kernel');
             $defaultPreview = $kernel->locateResource('@R3gisAppBundle/Resources/images/default_preview.png');
+            $logger->info("No image found. Return default ({$cacheFile})");
             $image = file_get_contents($defaultPreview);
         }
+        $logger->error("MAP-PREVIEW DONE [NO ERROR]");
         if ($isDownload) {
             $mapName = $map->getName();
             $mapName = mb_convert_encoding( $mapName, 'ISO-8859-1', 'UTF-8');
