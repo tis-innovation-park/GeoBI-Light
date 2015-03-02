@@ -43,7 +43,7 @@
                         <img ng-src="{{app.setting.baseUrl}}map/stat/{{map.hash}}/255/200/preview.png?t={{map.modDate}}" class="preview-map">
                         <h3>{{map.name}}</h3>
                         <p>{{map.description}}</p>
-                        <p><b>{{$root.text.homepage.lab_autore}}: </b>{{map.user}}</p>
+                        <p><b>{{$root.text.homepage.lab_autore}}: </b>{{map.user}} [{{map.language.id|uppercase}}]</p>
                         <p><time datetime="{{map.modDate}}">{{map.modDate | date: 'HH:mm dd/MM/yyyy' }}</time></p>
                         <div class="thumbnail-hover">
                             <!-- <button class="btn btn-default btn-action-map"><i class="fa fa-info-circle"></i></button> -->
