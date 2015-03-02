@@ -801,7 +801,7 @@
                 var originalContents = document.body.innerHTML;        
                 var popupWin = window.open('', '_blank', 'width=1024,height=1024');
                 popupWin.document.open();
-                popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="style.css" /></head><body onload="window.print()">' + printContents + '</html>');
+                popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="app/styles/css/print.css" /></head><body onload="window.print()">' + printContents + '</html>');
                 popupWin.document.close();
             } else {
                 var tiles = [];

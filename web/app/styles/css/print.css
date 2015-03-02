@@ -1,0 +1,27 @@
+@media print {
+    @page {size: landscape}
+    body {
+        font-family: tahoma, arial, verdana, sans-serif;
+        width: 29.7cm;
+        height: 21cm;
+        position: absolute;
+    }
+    body:before {
+        content: url('../img/logo_GeoBI.png');
+        background: #fff;
+        background-repeat: no-repeat;
+        height: 70px;
+        width: 240px;
+        position: absolute;
+        z-index: 1000;
+    }
+    .olControlAttribution {
+        top: 0;
+        left: 270px;
+        font-size: 9pt;
+    }
+    
+    .olMapViewport {
+        overflow: visible !important;
+    }
+}
