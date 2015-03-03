@@ -442,13 +442,15 @@ final class MapCreatorUtils {
             $newLayer->setMap($newMap)
                     ->setTemporary($temporary);
             $em->persist($newLayer);
-
+            $em->flush();
+            
             // Duplicate class
             $mapClass = $this->doctrine->getRepository('R3gisAppBundle:MapClass')->findBy(array('mapLayer' => $mapLayer), array('order' => 'ASC'));
             foreach ($mapClass as $class) {
                 $newClass = clone $class;
                 $newClass->setMapLayer($newLayer);
                 $em->persist($newClass);
+                $em->flush();
             }
         }
 
@@ -490,6 +492,7 @@ final class MapCreatorUtils {
                      ->setTemporary(false)
                      ->setOrder($order);
             $em->persist($newLayer);
+            $em->flush();
 
             // Duplicate class
             $mapClass = $this->doctrine->getRepository('R3gisAppBundle:MapClass')->findBy(array('mapLayer' => $mapLayer), array('order' => 'ASC'));
@@ -497,6 +500,7 @@ final class MapCreatorUtils {
                 $newClass = clone $class;
                 $newClass->setMapLayer($newLayer);
                 $em->persist($newClass);
+                $em->flush();
             }
         }
 
@@ -601,6 +605,13 @@ final class MapCreatorUtils {
         }
         $db = $this->db;
         $mapId = $map->getId();
+        
+        $db->beginTransaction();
+        
+        $sql = "UPDATE geobi.map_layer
+                SET ml_order = 1000 * ml_order
+                WHERE map_id={$mapId}";
+        $db->exec($sql);
 
         $sql = "UPDATE geobi.map_layer
                 SET ml_order = new_order
@@ -611,7 +622,8 @@ final class MapCreatorUtils {
                     ORDER BY ml_order
                 ) foo
                 WHERE map_layer.ml_id=foo.ml_id";
-        $db->exec($sql);            
+        $db->exec($sql);        
+        $db->commit();
     }
     
     public function swapLayers($hash, $order1, $order2) {
