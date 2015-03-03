@@ -340,6 +340,7 @@ class MapController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $em->persist($map);
         $em->flush();
+        $em->detach($map);
         $db->commit();
 
         //@TODO: Duplica data table!!!
@@ -636,6 +637,7 @@ class MapController extends Controller {
 
     private function getMapLayers(Map $map) {
         $result = array();
+        
         $mapLayers = $this->getDoctrine()
                 ->getRepository('R3gisAppBundle:MapLayer')
                 ->findBy(array('map' => $map), array('order' => 'ASC'));
@@ -740,6 +742,7 @@ class MapController extends Controller {
         $em = $this->getDoctrine()->getManager();
         $em->persist($map);
         $em->flush();
+        $em->detach($map);
     }
 
     // Return the map information from hash. Used to output data to client
@@ -957,6 +960,7 @@ class MapController extends Controller {
         }
         $em->persist($map);  // SS: Salvo tipo sfondo?
         $em->flush();
+        $em->detach($map);
         
         $mapUtils->reorderLayers($hash);
 
