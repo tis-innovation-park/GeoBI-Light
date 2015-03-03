@@ -518,7 +518,7 @@
                     } else {
                         controller.zoomToExtent(controller.data.extent);
                     }
-                    if(controller.layers.length === 1) {
+                    if(controller.layers.length === 1 && controller.data.isMine) {
                         controller.addLayerFromCkan();
                     }
                 }
@@ -757,7 +757,7 @@
         controller.loadMap = function(hash) {
             function fadeOLlayer(layer) {
                 var opacityI = window.setInterval(function() {
-                        if (layer.opacity <= 0){
+                        if (layer.opacity <= 0  && map.getLayer(layer.id)) {
                             map.removeLayer(layer);
                             window.clearInterval(opacityI);
                         } else {
