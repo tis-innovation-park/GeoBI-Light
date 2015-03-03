@@ -270,6 +270,7 @@ class MapStatController extends Controller {
      * @Route("/{hash}/stat/{order}", methods = {"GET"}, name="r3gis.map.wms_wrapper")
      */
     public function statWmsAction(Request $request, $hash, $order) {
+        // print_r($_REQUEST); die();
         $kernel = $this->get('kernel');
         $mapfile = $kernel->locateResource('@R3gisAppBundle/Resources/mapfile/stat.map');
 
@@ -280,6 +281,9 @@ class MapStatController extends Controller {
 
         $mapInfo = $this->getMapLayerInfo($hash, $order);
         $highlight = (int) $request->query->get('HIGHLIGHT');
+
+        $minMapSize = min($request->query->get('WIDTH'), $request->query->get('HEIGHT'));
+        $pointSizeMultiplier = $minMapSize / 1000;
 
         if (!empty($mapInfo)) {
 
@@ -330,20 +334,20 @@ class MapStatController extends Controller {
             }
             $fieldText = implode(', ', $fields);
             if ($mapInfo['is_shape']) {
-                $sql = "SELECT {$fieldText} FROM {$mapInfo['schema']}.{$mapInfo['table']}";
+                $sql = "SELECT {$fieldText} FROM {$mapInfo['schema']}.{$mapInfo['table']} ";
                 $layer->set('type', $this->getMSGeometryType($mapInfo['ms_geomery_type']));
             } else {
                 $geoTableName = empty($mapInfo['area_type_code']) ? 'area' : "area_part_{$mapInfo['area_type_code']}";
                 $sql = "SELECT {$fieldText}" .
                         " FROM {$mapInfo['schema']}.{$mapInfo['table']} " .
                         "INNER JOIN data.{$geoTableName} USING (ar_id) ";
-                if ($highlight) {
-                    $sql .= "WHERE gid={$highlight}";
-                }
-
                 $layer->set('type', MS_LAYER_POLYGON);
             }
 
+            if ($highlight) {
+                $sql .= "WHERE gid={$highlight}";
+            }
+                
             if ($mapInfo['layer_type'] == 'point') {
                 $layer->set('type', MS_LAYER_POINT);
             }
@@ -361,7 +365,7 @@ class MapStatController extends Controller {
                 $layer->setprocessing("CHART_SIZE={$w} {$h}");
                 $layer->setprocessing("CHART_TYPE=bar");
             }
-            
+            // echo $sql; die();
             $layer->set('data', "the_geom FROM ({$sql}) AS foo USING UNIQUE gid USING SRID={$mapInfo['srid']}");
 
             $tot = count($mapInfo['class']);
@@ -398,8 +402,9 @@ class MapStatController extends Controller {
                     'outline_color' => $mapInfo['outline_color'],
                     'opacity' => $opacity));
             } else if ($mapInfo['ms_layer_type'] == 'point' && $mapInfo['size_type'] == 'variable') {
-                
                     $totClasses = count($mapInfo['class']);
+                    $mapInfo['min_size'] = $mapInfo['min_size'] * $pointSizeMultiplier;
+                    $mapInfo['max_size'] = $mapInfo['max_size'] * $pointSizeMultiplier;
                     $size = $mapInfo['min_size'];
                     $delta = abs($mapInfo['max_size'] - $mapInfo['min_size']) / ($totClasses - 1);
                     
@@ -430,6 +435,7 @@ class MapStatController extends Controller {
                         $size = round($size + $delta);
                     }
             } else {
+                $mapInfo['min_size'] = $mapInfo['min_size'] * $pointSizeMultiplier;
                 if (!$highlight) {
                     foreach ($mapInfo['class'] as $class) {
                         $i++;
@@ -456,13 +462,16 @@ class MapStatController extends Controller {
                     $opacity = $mapInfo['opacity'];
                     $opacity = 60;
                     $color = 'ffff00';
-                    $this->addNoDataClass($layer, $mapInfo['ms_geomery_type'], array(
+                    $classOpt = array(
                         'color' => $color,
                         'outline_color' => null, //'FFFF00',
                         'opacity' => $opacity,
                         'symbol' => $mapInfo['symbol'],
-                        'hightlight' => $highlight
-                    ));
+                        'hightlight' => $highlight);
+                    if ($mapInfo['size_type'] == 'fixed') {
+                        $classOpt['size'] = $mapInfo['min_size'];
+                    }    
+                    $this->addNoDataClass($layer, $mapInfo['ms_geomery_type'], $classOpt);
                 }
             }
 
