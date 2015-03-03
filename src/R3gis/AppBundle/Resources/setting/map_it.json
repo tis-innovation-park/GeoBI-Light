@@ -27,12 +27,12 @@
         },
         "divisionNumber": {
             "options": [
-                { "key": "2", "value": "2" },
-                { "key": "3", "value": "3" },
-                { "key": "4", "value": "4" },
-                { "key": "5", "value": "5" },
-                { "key": "6", "value": "6" },
-                { "key": "7", "value": "7" }
+                { "key": 2, "value": "2" },
+                { "key": 3, "value": "3" },
+                { "key": 4, "value": "4" },
+                { "key": 5, "value": "5" },
+                { "key": 6, "value": "6" },
+                { "key": 7, "value": "7" }
             ]
         },
         "opacity": true,
