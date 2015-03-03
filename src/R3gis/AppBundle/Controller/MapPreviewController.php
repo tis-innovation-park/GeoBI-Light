@@ -63,6 +63,7 @@ class MapPreviewController extends Controller {
                 $d = new \DateTime();
                 $fileDate = $d->setTimestamp ( filemtime ( $cacheFile ));
             }
+            $fileDate = null; 
             if (empty($fileDate) || $fileDate < $map->getModDate() || !empty($extentRequest)) {
                 // Empty or old cache
                 $logger->info("Generating preview map");
@@ -83,7 +84,12 @@ class MapPreviewController extends Controller {
                 $layers = $this->getMapLayers($map);
 
                 $httpClient = new Client();
-                $url = $this->container->getParameter('author_url') . 'services/download.php';
+                $url = $this->container->getParameter('author_url');
+                if (substr($url, -1) != '/') {
+                    $url .= '/';
+                }
+                $url .= 'services/download.php';
+                
                 $logger->info("Getting preview from {$url}");
                 
                 $params = array();
@@ -113,23 +119,33 @@ class MapPreviewController extends Controller {
                 //$logger->debug("scalebar=");                
 
                 $layerNo = 0;
-                foreach ($this->getMapLayers($map) as $layer) {
-                    
-                    $wmsUrl = $this->container->getParameter('base_url') . "map/stat/{$hash}/stat/{$layer['order']}";
-                    $logger->debug("wms layer: {$wmsUrl}");
-                    
-                    $postBody->setField("tiles[{$layerNo}][url]", $wmsUrl);
-                    $postBody->setField("tiles[{$layerNo}][parameters][SERVICE]", 'WMS');
-                    $postBody->setField("tiles[{$layerNo}][parameters][VERSION]", '1.1.1');
-                    $postBody->setField("tiles[{$layerNo}][parameters][REQUEST]", 'GetMap');
-                    $postBody->setField("tiles[{$layerNo}][parameters][SRS]", 'EPSG:3857');
-                    $postBody->setField("tiles[{$layerNo}][parameters][LAYERS]", 'stat');
-                    $postBody->setField("tiles[{$layerNo}][parameters][FORMAT]", 'image/png; mode=8bit');
-                    $postBody->setField("tiles[{$layerNo}][parameters][TRANSPARENT]", 'true');
-                    $postBody->setField("tiles[{$layerNo}][parameters][GISCLIENT_MAP]", '1');
-                    $postBody->setField("tiles[{$layerNo}][opacity]", $layer['options']['opacity']);
+                $layers = $this->getMapLayers($map);
+                //print_r($layers);
+                //rsort($layers);
+                //print_r($layers); die();
+                foreach ($layers as $layer) {
+                    if ($layer['options']['active']) {
+                        $wmsUrl = $this->container->getParameter('base_url');
+                        if (substr($wmsUrl, -1) != '/') {
+                            $wmsUrl .= '/';
+                        }
+                        $wmsUrl .= "map/stat/{$hash}/stat/{$layer['order']}";
 
-                    $layerNo++;
+                        $logger->debug("wms layer: {$wmsUrl}");
+                    
+                        $postBody->setField("tiles[{$layerNo}][url]", $wmsUrl);
+                        $postBody->setField("tiles[{$layerNo}][parameters][SERVICE]", 'WMS');
+                        $postBody->setField("tiles[{$layerNo}][parameters][VERSION]", '1.1.1');
+                        $postBody->setField("tiles[{$layerNo}][parameters][REQUEST]", 'GetMap');
+                        $postBody->setField("tiles[{$layerNo}][parameters][SRS]", 'EPSG:3857');
+                        $postBody->setField("tiles[{$layerNo}][parameters][LAYERS]", 'stat');
+                        $postBody->setField("tiles[{$layerNo}][parameters][FORMAT]", 'image/png; mode=8bit');
+                        $postBody->setField("tiles[{$layerNo}][parameters][TRANSPARENT]", 'true');
+                        $postBody->setField("tiles[{$layerNo}][parameters][GISCLIENT_MAP]", '1');
+                        $postBody->setField("tiles[{$layerNo}][opacity]", $layer['options']['opacity']);
+                    
+                        $layerNo++;
+                    }
                 }
 
                 $httpResponse = $httpClient->send($httpRequest);
@@ -179,6 +195,7 @@ class MapPreviewController extends Controller {
             $logger->info("No image found. Return default ({$cacheFile})");
             $image = file_get_contents($defaultPreview);
         }
+        // echo $image; die();
         $logger->error("MAP-PREVIEW DONE [NO ERROR]");
         if ($isDownload) {
             $mapName = $map->getName();
