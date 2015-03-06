@@ -98,25 +98,25 @@ class MapPreviewController extends Controller {
                 $postBody = $httpRequest->getBody();
 
                 $postBody->setField('viewport_size[0]', $width);
-                //$logger->debug("viewport_size[0]={$width}");
+                $logger->info("viewport_size[0]={$width}");
                 
                 $postBody->setField('viewport_size[1]', $height);
-                //$logger->debug("viewport_size[1]={$height}");
+                $logger->info("viewport_size[1]={$height}");
                 
                 $postBody->setField('format', 'png');
-                //$logger->debug("format=png");
+                $logger->info("format=png");
                 
                 $postBody->setField('extent', "{$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
-                //$logger->debug("extent[1]={$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
+                $logger->info("extent[1]={$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
                 
                 $postBody->setField('dpi', '96');
-                //$logger->debug("dpi=96");
+                $logger->info("dpi=96");
                 
                 $postBody->setField('srid', 'EPSG:3857');
-                //$logger->debug("srid=EPSG:3857");
+                $logger->info("srid=EPSG:3857");
                 
                 $postBody->setField("scalebar", '');  // Prevent scale bar to generate 
-                //$logger->debug("scalebar=");                
+                $logger->info("scalebar=");                
 
                 $layerNo = 0;
                 $layers = $this->getMapLayers($map);
