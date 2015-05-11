@@ -480,7 +480,7 @@
         init();
     });
 
-    app.controller('MapController', function($rootScope, $scope, $stateParams, apiFactory, storageFactory, ngDialog) {
+    app.controller('MapController', function($rootScope, $scope, $stateParams, $timeout, apiFactory, storageFactory, ngDialog) {
         var controller = this;
         var map = null;
         var toolTipTimer = null;
@@ -502,7 +502,7 @@
         function init() {
             controller.hash = $stateParams.hash;
             controller.currentHash = controller.hash;
-            apiFactory.getMap(controller.hash).success(function(res){
+            apiFactory.getMap(controller.hash).success(function(res) {
                 if (res.success) {
                     var hashList = [];
                     controller.configMap.projection = new OpenLayers.Projection(res.result.map.displayProjection); 
@@ -518,11 +518,13 @@
                     } else {
                         controller.zoomToExtent(controller.data.extent);
                     }
-                    if(controller.layers.length === 1 && controller.data.isMine) {
-                        controller.addLayerFromCkan();
+                    if(controller.data.isMine) {
+                        if (controller.layers.length === 1) {
+                            controller.addLayerFromCkan();
+                        }
                     }
                 }
-            }).error(function(res){
+            }).error(function(res) {
                 alert('Error:\n' + res.result.error.text);
                 console.log(res);
             });
@@ -530,59 +532,25 @@
             loadSetting();
         }
 
-        function toolTip(xy){
-            var params = {};
-            var t = new Date().getTime();
-
-            var position = map.getLonLatFromViewPortPx(xy);
-            params.lon = position.lon;
-            params.lat = position.lat;
-
-            var extent = map.getExtent();
-
-            var callApi = function(layer) {
-                var unit = layer.options.unit? layer.options.unit: '';
-                apiFactory.getStatInfo(controller.currentHash, layer.order, params).success(function(res) {
-                    if (res.success) {
-                        for (var j=0; j<res.result.length; j++) {
-                            var hl = map.getLayersByName(/Highlight Layer/);
-                            if (hl.length === 0 || !(hl[0].params.ORDER === layer.order && hl[0].params.HIGHLIGHT === res.result[j].id)) {
-                                if(hl.length > 0 && hl[0].params.T === t && hl[0].params.ORDER > layer.order) {
-                                    return;
-                                }
-                                for (var k=0; k<hl.length; k++) {
-                                    map.removeLayer(hl[k]);
-                                }
-                                removeTooltip();
-                                addHighlightLayer(controller.currentHash, layer.order, res.result[j].id, t);
-                                var html = '<b>'+ layer.name +'</b><br />Name: '+ res.result[j].name +'<br />Data: '+ res.result[j].data +' '+ unit;
-                                controller.popup = new OpenLayers.Popup("Stat info", position, new OpenLayers.Size(200,100), html, true, removeTooltip);
-                                map.addPopup(controller.popup);
-                            }
-                        }
-                    }
-                }).error(function(res){
-                    alert('Error:\n' + res.result.error.text);
-                    console.log(res);
-                }); 
-            };
-
-            for (var i = 1; i < controller.layers.length; i++) {
-                var layer = controller.layers[i];
-                if(!layer.active) {
-                    continue;
-                }
-                var scale = map.getScale();
-                params.buffer = 3 * (scale/1000); //set the ideal buffer (3) on map unit (1000) and scale it!
-                callApi(layer);
-            }
-        }
-
         function addHighlightLayer(hash, order, id, t) {
             controller.setting = storageFactory.load('setting');
             var wmsBaseUrl = controller.setting.baseUrl +'map/stat/'+ hash +'/stat/'+ order;
             var layer = new OpenLayers.Layer.WMS('Highlight Layer '+ order +'_'+ id, wmsBaseUrl, {order: order, t: t, highlight: id, layers: 'stat', format: 'image/png; mode=8bit'}, {singleTile: true, isBaseLayer: false, noMagic: true, opacity: 1, visibility: true});
             map.addLayer(layer);            
+        }
+
+        function checkUpdateMap(hash) {
+            apiFactory.checkUpdateMap(hash).success(function(res) {
+                if (res.success) {
+                    controller.update = [];
+                    for (var i=0; i<res.result.length; i++) {
+                        controller.update[res.result[i].order] = res.result[i];
+                    }
+                }
+            }).error(function(res) {
+                alert('Error:\n' + res.result.error.text);
+                console.log(res);
+            });
         }
 
         function initMap() {
@@ -629,6 +597,54 @@
                 /* remove all Highlight layer */
                 removeHighlightLayer();
                 map.removePopup(controller.popup);
+            }
+        }
+
+        function toolTip(xy) {
+            var params = {};
+            var t = new Date().getTime();
+
+            var position = map.getLonLatFromViewPortPx(xy);
+            params.lon = position.lon;
+            params.lat = position.lat;
+
+            var extent = map.getExtent();
+
+            var callApi = function(layer) {
+                var unit = layer.options.unit? layer.options.unit: '';
+                apiFactory.getStatInfo(controller.currentHash, layer.order, params).success(function(res) {
+                    if (res.success) {
+                        for (var j=0; j<res.result.length; j++) {
+                            var hl = map.getLayersByName(/Highlight Layer/);
+                            if (hl.length === 0 || !(hl[0].params.ORDER === layer.order && hl[0].params.HIGHLIGHT === res.result[j].id)) {
+                                if(hl.length > 0 && hl[0].params.T === t && hl[0].params.ORDER > layer.order) {
+                                    return;
+                                }
+                                for (var k=0; k<hl.length; k++) {
+                                    map.removeLayer(hl[k]);
+                                }
+                                removeTooltip();
+                                addHighlightLayer(controller.currentHash, layer.order, res.result[j].id, t);
+                                var html = '<b>'+ layer.name +'</b><br />Name: '+ res.result[j].name +'<br />Data: '+ res.result[j].data +' '+ unit;
+                                controller.popup = new OpenLayers.Popup("Stat info", position, new OpenLayers.Size(200,100), html, true, removeTooltip);
+                                map.addPopup(controller.popup);
+                            }
+                        }
+                    }
+                }).error(function(res){
+                    alert('Error:\n' + res.result.error.text);
+                    console.log(res);
+                }); 
+            };
+
+            for (var i = 1; i < controller.layers.length; i++) {
+                var layer = controller.layers[i];
+                if(!layer.active) {
+                    continue;
+                }
+                var scale = map.getScale();
+                params.buffer = 3 * (scale/1000); //set the ideal buffer (3) on map unit (1000) and scale it!
+                callApi(layer);
             }
         }
 
@@ -691,21 +707,29 @@
 
         controller.getCkanDataset = function(params){
             var ckanParams = {
-                package: params.ckanPackage.id,
-                id: params.ckanId.id
+                package: params.package,
+                id: params.ckan_id
             };
             controller.pending = true;
             apiFactory.getDataset(ckanParams).success(function(res) {
                 if(res.success) {
                     controller.pending = false;
                     controller.sheetData = res.result;
+                    var data = {
+                        sheetData: controller.sheetData,
+                        package: ckanParams.package,
+                        id: ckanParams.id
+                    };
+                    if (params.order) {
+                        data.order = params.order;
+/*                        data.sheet = params.sheet;
+                        data.numericColumn = params.data_column;
+                        data.spatialColumn = params.spatial_column;*/
+                    }
+
                     ngDialog.open({
                         template: 'app/map/AddLayer/addLayer2.html',
-                        data: {
-                            sheetData: controller.sheetData,
-                            package: params.ckanPackage.id,
-                            id: params.ckanId.id
-                        },
+                        data: data,
                         controller: 'ImportTableController as importTable',
                         preCloseCallback: function(returned){
                             if(returned.hasOwnProperty('callback')) {
@@ -734,6 +758,9 @@
                 hash: controller.currentHash,
                 duplicate: true
             };
+            if (params.order) {
+                options.order = params.order;
+            }
             apiFactory.addLayer(options).success(function(res){
                 if(res.success) {
                     controller.currentHash = res.result.hash;
@@ -787,6 +814,10 @@
                 var layer = controller.layers[i];
                 controller.addMapLayer(layer);
 
+            }
+
+            if(controller.data.isMine) {
+                checkUpdateMap(hash);
             }
         };
 
@@ -904,7 +935,10 @@
         controller.saveMap = function() {
             apiFactory.saveMap(controller.currentHash, controller.hash, controller.data).success(function(res){
                 if (res.success) {
-                    console.log(res);
+                    controller.data.state = 'saved';
+                    $timeout(function() {
+                        delete controller.data.state;
+                    }, 3000);
                 }
             }).error(function(res){
                 alert('Error:\n' + res.result.error.text);
@@ -929,6 +963,10 @@
             var OLlayer = map.getLayersByName(name + layer.order);
             OLlayer[0].setVisibility(layer.active);
         };
+
+        controller.updateDataLayer = function(order) {
+            controller.getCkanDataset(order);
+        }
 
         controller.undoMap = function() {
             controller.mapLock = true;
@@ -1330,6 +1368,7 @@
             params += 'hash=' + options.hash;
             params += !!options.spatial_column? '&spatial_column=' + options.spatial_column : '&spatial_column=';
             params += !!options.data_column? '&data_column=' + options.data_column : '';
+            params += !!options.order? '&order=' + options.order : '';
             params += '&duplicate=' + options.duplicate;
 
             var request = $http({
@@ -1342,6 +1381,13 @@
 
         };
 
+        factory.changePassword = function(hash, password) {
+            var data = {
+                password: password
+            };
+            return $http.put(apiUrls.resetPassword + '/reset/' + hash, data);
+        };
+
         factory.checkDataLayer = function(hash, order, params) {
             var url = '';
             url += !!params.limit? '&limit=' + params.limit: '';
@@ -1349,12 +1395,9 @@
             return $http.get(apiUrls.map + '/' + hash + '/data/' + order + '/data.json?spatialMatch=false' + url);
         };
 
-        factory.changePassword = function(hash, password) {
-            var data = {
-                password: password
-            };
-            return $http.put(apiUrls.resetPassword + '/reset/' + hash, data);
-        };
+        factory.checkUpdateMap = function(hash) {
+            return $http.get(apiUrls.map + '/' + hash + '/update_check.json')
+        }
 
         factory.copyMap = function(hash, lang){
             var params = {

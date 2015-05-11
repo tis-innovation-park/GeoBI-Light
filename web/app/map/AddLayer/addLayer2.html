@@ -26,6 +26,6 @@
     </div>
 </div>
 <div class="form-group text-right">
-    <button class="btn btn-default" ng-click="closeThisDialog({callback:'addLayerFromCkan'})">{{$root.text.map.but_indietro}}</button>
+    <button class="btn btn-default" ng-hide="ngDialogData.order" ng-click="closeThisDialog({callback:'addLayerFromCkan'})">{{$root.text.map.but_indietro}}</button>
     <button class="btn btn-default" ng-disabled="!ngDialogData.sheet.is_valid" ng-click="closeThisDialog({callback:'getCkanLayer', data: ngDialogData})">{{$root.text.map.but_fatto}}</button>
 </div>

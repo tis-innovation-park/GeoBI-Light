@@ -12,6 +12,6 @@
         <p class="help-block">{{addLayer.ckanId.description}}</p>
     </div>
     <div class="form-group text-right">
-        <button class="btn btn-default" ng-click="closeThisDialog({callback: 'getCkanDataset', data: addLayer})">{{$root.text.map.but_importa}}</button>
+        <button class="btn btn-default" ng-click="closeThisDialog({callback: 'getCkanDataset', data: {package: addLayer.ckanPackage.id, ckan_id: addLayer.ckanId.id}})">{{$root.text.map.but_importa}}</button>
     </div>
 </div>
