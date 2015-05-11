@@ -23,10 +23,6 @@ button:focus {
     visibility: hidden;
 }
 
-input#filters_it:checked ~ div > label[for=filters_it], input#filters_de:checked ~ div > label[for=filters_de], input#filters_en:checked ~ div > label[for=filters_en], input#filters_priv_only_false:checked ~ div > label[for=filters_priv_only_false], input#filters_priv_only_true:checked ~ div > label[for=filters_priv_only_true] {
-    color: @green;
-}
-
 .clear-button {
     padding: 0;
     border: none;
@@ -237,6 +233,10 @@ input[type=number] {
         border-color: #eae8e8;
         font-weight: 600;
     }
+}
+
+input#filters_it:checked ~ div > label[for=filters_it], input#filters_de:checked ~ div > label[for=filters_de], input#filters_en:checked ~ div > label[for=filters_en], input#filters_priv_only_false:checked ~ div > label[for=filters_priv_only_false], input#filters_priv_only_true:checked ~ div > label[for=filters_priv_only_true], .btn-active {
+    color: @green;
 }
 
 .saved, .saved:hover, .saved:focus {

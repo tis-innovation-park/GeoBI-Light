@@ -1024,6 +1024,7 @@
             limit: 20,
             offset: 0
         };
+        controller.order = '';
 
         controller.areAllMapsLoading = function() {
             if (controller.total) {
@@ -1070,7 +1071,8 @@
                 de: controller.filters.de,
                 en: controller.filters.en,
                 limit: controller.paginations.limit,
-                offset: controller.paginations.offset
+                offset: controller.paginations.offset,
+                order: controller.order
             };
             apiFactory.getMaps(filters).success(function(res){
                 if (res.success) {
@@ -1097,6 +1099,16 @@
                 controller: 'NewMapController as newmap'
             });
         };
+
+        controller.toggleOrder = function(order) {
+            console.log(order);
+            if (order === controller.order) {
+                controller.order = '';
+            } else {
+                controller.order = order;
+            }
+            controller.getMaps(true);
+        }
 
         $scope.$watchCollection('mapslist.filters', function() {
             controller.getMaps(true);

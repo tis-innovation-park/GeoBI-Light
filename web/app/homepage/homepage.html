@@ -10,6 +10,10 @@
                             <label class="label-clear-style btn btn-default" for="filters_priv_only_false">{{$root.text.homepage.but_tutte}}</label>
                             <label class="label-clear-style btn btn-default" for="filters_priv_only_true">{{$root.text.homepage.but_lemiemappe}}</label>
                         </div>
+                        <div class="btn-group">
+                            <label ng-click="mapslist.toggleOrder('recent')" ng-class="{'btn-active': mapslist.order === 'recent'}" class="label-clear-style btn btn-default">Più recenti</label>
+                            <label ng-click="mapslist.toggleOrder('click')" ng-class="{'btn-active': mapslist.order === 'click'}" class="label-clear-style btn btn-default">Più cliccate</label>
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-8 col-xs-12 text-right">

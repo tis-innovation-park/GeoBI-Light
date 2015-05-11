@@ -103,10 +103,10 @@ class MapController extends Controller {
             foreach ($orders as $ord) {
                 switch ($ord) {
                     case 'recent':
-                        $qb->addOrderBy('m.modDate', 'ASC');
+                        $qb->addOrderBy('m.modDate', 'DESC');
                         break;
                     case 'click':
-                        $qb->addOrderBy('m.clickCount', 'ASC');
+                        $qb->addOrderBy('m.clickCount', 'DESC');
                         break;
                         break;
                 }
