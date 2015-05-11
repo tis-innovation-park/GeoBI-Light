@@ -40,7 +40,7 @@ class MapPreviewController extends Controller {
         $cachePath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment() . '/preview/';
         $extentRequest = $request->query->get('extent');
         $isDownload = $request->query->get('download') !== null;
-        $logger->error("MAP-PREVIEW START [NO ERROR]");
+        //$logger->error("MAP-PREVIEW START [NO ERROR]");
         
         $fs = new Filesystem();
         if (!$fs->exists($cachePath)) {
@@ -63,7 +63,7 @@ class MapPreviewController extends Controller {
                 $d = new \DateTime();
                 $fileDate = $d->setTimestamp ( filemtime ( $cacheFile ));
             }
-            $fileDate = null; 
+            // $fileDate = null; 
             if (empty($fileDate) || $fileDate < $map->getModDate() || !empty($extentRequest)) {
                 // Empty or old cache
                 $logger->info("Generating preview map");
@@ -98,25 +98,25 @@ class MapPreviewController extends Controller {
                 $postBody = $httpRequest->getBody();
 
                 $postBody->setField('viewport_size[0]', $width);
-                $logger->info("viewport_size[0]={$width}");
+                // $logger->info("viewport_size[0]={$width}");
                 
                 $postBody->setField('viewport_size[1]', $height);
-                $logger->info("viewport_size[1]={$height}");
+                // $logger->info("viewport_size[1]={$height}");
                 
                 $postBody->setField('format', 'png');
-                $logger->info("format=png");
+                // $logger->info("format=png");
                 
                 $postBody->setField('extent', "{$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
-                $logger->info("extent[1]={$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
+                // $logger->info("extent[1]={$extent[0]},{$extent[1]},{$extent[2]},{$extent[3]}");
                 
                 $postBody->setField('dpi', '96');
-                $logger->info("dpi=96");
+                // $logger->info("dpi=96");
                 
                 $postBody->setField('srid', 'EPSG:3857');
-                $logger->info("srid=EPSG:3857");
+                // $logger->info("srid=EPSG:3857");
                 
                 $postBody->setField("scalebar", '');  // Prevent scale bar to generate 
-                $logger->info("scalebar=");                
+                //$logger->info("scalebar=");                
 
                 $layerNo = 0;
                 $layers = $this->getMapLayers($map);
@@ -196,7 +196,7 @@ class MapPreviewController extends Controller {
             $image = file_get_contents($defaultPreview);
         }
         // echo $image; die();
-        $logger->error("MAP-PREVIEW DONE [NO ERROR]");
+        //$logger->error("MAP-PREVIEW DONE [NO ERROR]");
         if ($isDownload) {
             $mapName = $map->getName();
             $mapName = mb_convert_encoding( $mapName, 'ISO-8859-1', 'UTF-8');
