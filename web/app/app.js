@@ -1101,7 +1101,6 @@
         };
 
         controller.toggleOrder = function(order) {
-            console.log(order);
             if (order === controller.order) {
                 controller.order = '';
             } else {
