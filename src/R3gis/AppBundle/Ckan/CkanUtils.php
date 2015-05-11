@@ -96,14 +96,12 @@ final class CkanUtils {
         if ($ttl <= 0 || !$fs->exists($fileName) || filemtime($fileName) + $ttl < time()) {
 
             $this->log(\Psr\Log\LogLevel::DEBUG, __METHOD__ . ": Get {$url}, ttl={$ttl}");
-//echo "{$url}\n";
             $response = $this->httpClient->get($url);
             // SS: Verificare http error ...
             $json = $response->json();
-//print_r($json); 
-//echo "\n\n";
+
             if (empty($json['success']) || $json['success'] !== true) {
-                // SS: log
+                $this->log(\Psr\Log\LogLevel::ERROR, __METHOD__ . ": getJson error: Result is not a json");
                 throw new \Exception("getJson error: Result is not a json");
             }
             $tmpFileName = $fileName . '.' . uniqid();
@@ -196,7 +194,7 @@ final class CkanUtils {
                 continue;
             }
             $url = "{$this->baseUrl}api/3/action/package_show?id={$packageCode}";
-            $json = $this->getJson($url, 24 * 60 * 60);
+            $json = $this->getJson($url, $ttl);
             if ($json['result']['state'] == 'active' && $json['result']['type'] == 'dataset') {
                 $res = array(
                     'id' => $packageCode, //$json['result']['id'],

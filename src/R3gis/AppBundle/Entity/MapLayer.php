@@ -82,7 +82,7 @@ class MapLayer {
      * @ORM\Column(name="ml_ckan_sheet", type="string")
      */
     private $ckanSheet;
-
+    
     /**
      * @var string $isShape
      *
@@ -222,14 +222,6 @@ class MapLayer {
         $this->map = null;
     }
     
-
-    /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
-    public function setCreatedAtValue() {
-        $this->modDate = new \DateTime();
-    }
 
     /**
      * Set id
@@ -452,7 +444,7 @@ class MapLayer {
 
         return $this;
     }
-
+    
     /**
      * Get ckanSheet
      *
@@ -461,8 +453,7 @@ class MapLayer {
     public function getCkanSheet() {
         return $this->ckanSheet;
     }
-
-
+    
     /**
      * Set isShape
      *

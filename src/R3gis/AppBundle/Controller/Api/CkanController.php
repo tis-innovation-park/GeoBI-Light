@@ -174,7 +174,8 @@ class CkanController extends Controller {
         $sql = "SELECT it.it_id, it_schema, it_table, it_sheet, it_ckan_valid, it_is_shape, it_shape_prj_status, itd_column, itd_name, itd_spatial_data, itd_numeric_data 
                    FROM geobi.import_tables it
                    INNER JOIN geobi.import_tables_detail itd ON it.it_id=itd.it_id
-                   WHERE it_ckan_package=:it_ckan_package AND it_ckan_id=:it_ckan_id AND it.it_id=:it_id";
+                   WHERE it_ckan_package=:it_ckan_package AND it_ckan_id=:it_ckan_id AND it.it_id=:it_id
+                   ORDER BY itd_spatial_data DESC, itd_id";
         // echo $sql;
         $stmt = $db->prepare($sql);
         $stmt->execute(array('it_ckan_package' => $package, 'it_ckan_id' => $id, 'it_id'=>(int)$table));

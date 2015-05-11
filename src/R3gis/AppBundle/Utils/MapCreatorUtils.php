@@ -225,7 +225,7 @@ final class MapCreatorUtils {
         $mapLayer = new MapLayer();
         
         // Get the real name of the column
-        $sql = "select d1.itd_name as geo_name, d2.itd_name as data_name
+        $sql = "select d1.itd_name as geo_name, d2.itd_name as data_name, it_ckan_date
                 from geobi.import_tables t 
                 left join geobi.import_tables_detail d1 on t.it_id=d1.it_id and d1.itd_column=:itd_geo_column and d1.itd_spatial_data IS TRUE
                 left join geobi.import_tables_detail d2 on t.it_id=d2.it_id and d2.itd_column=:itd_data_column and d2.itd_numeric_data IS TRUE
@@ -243,6 +243,7 @@ final class MapCreatorUtils {
         $headers = $stmt->fetchAll(\PDO::FETCH_ASSOC );
         $dataHeader = $headers[0]['data_name'];
         $geoHeader = $headers[0]['geo_name'];
+        $cKanDate = $headers[0]['it_ckan_date'];
 
         $mapLayer->setMap($this->map)
                 ->setName(DefaultsUtils::getMapLayerName($this->lang))
@@ -251,6 +252,7 @@ final class MapCreatorUtils {
                 ->setCkanSheet($sheet)
                 ->setCkanPackage($ckanPackage)
                 ->setCkanId($ckanId)
+                ->setModDate(\DateTime::createFromFormat("Y-m-d H:i:s", $cKanDate))
                 ->setOrder($this->getNextLayerOrder())
                 ->setDivisions(DefaultsUtils::getMapLayerDivision($this->lang))
                 ->setIsShape($data['it_is_shape'])

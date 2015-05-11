@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use R3gis\AppBundle\Utils\MapCreatorUtils;
 use R3gis\AppBundle\Controller\Api\MapController;
 use R3gis\AppBundle\Entity\Map;
+use R3gis\AppBundle\Exception\ApiException;
 
 /**
  * @Route("/import")
@@ -39,6 +40,7 @@ class ImportController extends Controller {
         $spatialColumn = $request->request->get('spatial_column');
         $dataColumn = $request->request->get('data_column');
         $lang = $request->request->get('lang', 'en');
+        $order = $request->request->get('order', null);
         $duplicate = true; // $request->request->get('duplicate') === 'true';
         $hash = $request->request->get('hash');
 
@@ -83,8 +85,38 @@ class ImportController extends Controller {
 
         $mapUtils->setDefaults($layer);
 
+        if ($order >= 1) {  // if order
+            $em = $this->getDoctrine()->getManager();
+            
+            $oldLayer = $this->getDoctrine()->getRepository('R3gisAppBundle:MapLayer')->findOneBy(array('map' => $map, 'order'=>$order));
+            if (empty($oldLayer)) {
+                throw new ApiException(ApiException::NOT_FOUND, 'Later 1 not found');
+            }
+            $oldLayer->setModDate($layer->getModDate());
+            $oldLayer->setTableSchema($layer->getTableSchema());
+            $oldLayer->setTableName($layer->getTableName());
+            $oldLayer->setCkanPackage($layer->getCkanPackage());
+            $oldLayer->setCkanId($layer->getCkanId());
+            $oldLayer->setCkanSheet($layer->getCkanSheet());
+            $oldLayer->setIsShape($layer->getIsShape());
+            $oldLayer->setDataColumn($layer->getDataColumn());
+            $oldLayer->setSpatialColumn($layer->getSpatialColumn());
+            $oldLayer->setSpatialColumnHeader($layer->getSpatialColumnHeader());
+            $oldLayer->setDataColumnHeader($layer->getDataColumnHeader());
+            
+            $em->persist($oldLayer);
+            $em->flush();
+            //$em->detach($oldLayer);
+            
+            $em->remove($layer);
+            //$em->flush();
+            //$em->detach($layer);
+            
+            //$em->persist($map);
+            $em->refresh($map);
+            
+        }
         $db->commit();
-
         $jsonResponse = $this->forward('R3gisAppBundle:Api\Map:info', array(
             'hash' => $hash
         ));
@@ -93,7 +125,6 @@ class ImportController extends Controller {
         if (empty($jsonData['success'])) {
             throw new \Exception("Invalid response from Api\Map controller");
         }
-
         $result = array(
             'hash' => $hash,
             'map' => $jsonData['result']['map']);

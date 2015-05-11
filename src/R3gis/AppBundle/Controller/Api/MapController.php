@@ -19,6 +19,8 @@ use R3gis\AppBundle\Exception\ApiException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use R3gis\AppBundle\Ckan\CkanDataAnalyzerUtils;
+use R3gis\AppBundle\Ckan\CkanUtils;
+use R3gis\AppBundle\Ckan\CkanCacheUtils;
 
 /**
  * @Route("/map")
@@ -345,7 +347,7 @@ class MapController extends Controller {
 
         //@TODO: Duplica data table!!!
 
-        // aaaaa$result = array('hash' => $newHash);
+        // $result = array('hash' => $newHash);
         $response->setData(array(
             'success' => true,
             'result' => $this->getMapInfo($newHash)
@@ -396,6 +398,109 @@ class MapController extends Controller {
         ));
 
         return $response;
+    }
+    
+    // Return the last_modified field for the given cKan data. Return false or DateTime
+    private function searchCkanModDate(array $cKanPackageList, $cKanPackage, $ckanId) {
+        
+        foreach($cKanPackageList as $package) {
+            if ($package['id'] == $cKanPackage) {
+                foreach($package['resources'] as $resource) {
+                    if ($resource['id'] == $ckanId) {
+                        return \DateTime::createFromFormat('Y-m-d\TH:i:s', $resource['last_modified']);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * @api {get} /map/{hash}/update_check.json  Check cKan for data changes
+     * @apiName checkUpdateAction
+     * @apiGroup Map
+     *
+     * @apiDescription Return the layer list with data update
+     * 
+     */
+    
+    /**
+     * @Route("/{hash}/update_check.json", methods = {"GET"}, name="r3gis.api.map.update_check")
+     */
+    public function checkUpdateAction(Request $request, $hash) {
+        
+        $baseUrl = CkanController::CKAN_BASE_URL;
+        
+        $layers = array();
+        $result = array();
+        
+        $response = new JsonResponse();
+        try {
+            $db = $this->getDoctrine()->getConnection();
+            $kernel = $this->get('kernel');
+            $cachePath = $kernel->getRootDir() . '/cache/' . $kernel->getEnvironment();
+
+            $ckan = new CkanUtils($baseUrl, $cachePath);
+            $ckan->setLogger($this->get('logger'));
+        
+            $packages = array();
+            $sql = "SELECT ml_order, ml_ckan_package, ml_ckan_id, ml_mod_date, ml_ckan_sheet, ml_data_column, ml_spatial_column
+                    FROM geobi.map
+                    INNER JOIN geobi.map_layer USING(map_id)
+                    WHERE map_hash=:map_hash";
+            $stmt = $db->prepare($sql);
+            $stmt->execute(array('map_hash' => $hash));
+            
+            foreach($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                $packages[$row['ml_ckan_package']] = $row['ml_ckan_package'];
+                $layers[] = $row;
+            }
+            $packages = $ckan->sanitarizePackageList(array_values($packages), true);
+        
+            
+            foreach($layers as $curLayer) {
+                $cKanModDate = $this->searchCkanModDate($packages, $curLayer['ml_ckan_package'], $curLayer['ml_ckan_id']);
+                $curLayerModDate = \DateTime::createFromFormat('Y-m-d H:i:s', $curLayer['ml_mod_date']);
+                if ($cKanModDate > $curLayerModDate) {
+                    $result[] = array(
+                        'order' => $curLayer['ml_order'],
+                        'ckan_old_date' => $curLayer['ml_mod_date'],
+                        'ckan_new_date' => $cKanModDate->format('Y-m-d H:i:s'),
+                        'package' => $curLayer['ml_ckan_package'],
+                        'ckan_id' => $curLayer['ml_ckan_id'],
+                        'sheet' => $curLayer['ml_ckan_sheet'],
+                        'data_column' => $curLayer['ml_data_column'],
+                        'spatial_column' => $curLayer['ml_spatial_column']);
+                    
+                    // Remove temporary data
+                    $sql = "DELETE FROM geobi.import_tables WHERE it_ckan_package=:it_ckan_package AND it_ckan_id=:it_ckan_id AND it_ckan_date<=:it_ckan_date";
+                    $stmt = $db->prepare($sql);
+                    $stmt->execute(array('it_ckan_package' => $curLayer['ml_ckan_package'], 
+                                         'it_ckan_id' => $curLayer['ml_ckan_id'],
+                                         'it_ckan_date' => $cKanModDate->format('Y-m-d H:i:s')));
+                }
+            }
+
+            if (count($result) > 0) {
+                $ckanCache = new CkanCacheUtils($this->getDoctrine());
+                $ckanCache->setLogger($this->get('logger'));
+                $ckanCache->purge();
+            }    
+        
+        
+            $response->setData(array(
+                'success' => true,
+                'result' => $result
+            ));
+        } catch (\Exception $e) {
+            // throw $e;
+            $response->setData(array(
+                'success' => false,
+                'error' => $e->getMessage()
+            ));
+        }
+        return $response;
+
     }
 
     /**
@@ -638,10 +743,14 @@ class MapController extends Controller {
     private function getMapLayers(Map $map) {
         $result = array();
         
+        $em = $this->getDoctrine()->getManager();
         $mapLayers = $this->getDoctrine()
                 ->getRepository('R3gisAppBundle:MapLayer')
                 ->findBy(array('map' => $map), array('order' => 'ASC'));
+                
         foreach ($mapLayers as $mapLayer) {
+            $em->refresh($mapLayer);
+            
             $layerInfo = MapController::getMapLayer($this->getDoctrine(), $mapLayer);
             $result[] = array(
                 'name' => $layerInfo['name'],
@@ -801,7 +910,7 @@ class MapController extends Controller {
         foreach (array('language', 'user', 'idParent', 'clickCount', 'userExtent', 'backgroundType', 'description', 'name', 'id', 'insDate', 'modDate', 'private', 'temporary') as $delKey) {
             unset($mapData[$delKey]);
         }
-//print_r($mapData);
+
         return $mapData;
     }
 
