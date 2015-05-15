@@ -1,10 +1,10 @@
-<h2><span class="ngdialog-span-title">Correggi</span> dati</h2>
-<div class="alert alert-warning">Messaggio</div>
+<h2><span class="ngdialog-span-title">{{$root.text.map.txt_correggidati1}}</span> {{$root.text.map.txt_correggidati2}}</h2>
+<div class="alert alert-warning">{{$root.text.map.txt_nonreversibile}}</div>
 <table class="table-bordered table-condensed correction-data" ng-show="editData.rows.length > 0">
     <thead>
         <tr>
             <th>{{editData.header.spatialColumn}}</th>
-            <th>correzione</th>
+            <th>{{$root.text.map.lab_correzione}}</th>
             <th>{{editData.header.dataColumn}}</th>
             <th></th>
         </tr>
@@ -17,7 +17,7 @@
             </td class="col-sm-3 td-reset-align">
             <td>
                 <select class="form-control input-sm data-yes" ng-model="editData.tempData[$index].correctValue" ng-options="option as option.value for option in editData.tempData[$index].autoComplete | orderBy: option.priority" ng-disabled="editData.tempData[$index].autoComplete < 1">
-                    <option value="">-- selezionare correzione --</option>
+                    <option value="">{{$root.text.map.opt_selezionare}}</option>
                 </select>
             </td>
             <td class="col-sm-3 td-reset-align">
@@ -31,5 +31,5 @@
     </tbody>
 </table>
 <p ng-hide="editData.rows.length > 0">
-Non ci sono dati da correggere
+{{$root.text.map.txt_nodati}}
 </p>

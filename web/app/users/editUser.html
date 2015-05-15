@@ -1,28 +1,28 @@
-<h2><span class="ngdialog-span-title">Modifica</span> utente</h2>
+<h2><span class="ngdialog-span-title">{{$root.text.user.lab_modificautente1}}</span> {{$root.text.user.lab_modificautente2}}</h2>
 <div class="form">
     <div class="form-group">
-        <label>Nome</label>
+        <label>{{$root.text.user.lbl_nome}}</label>
         <input class="form-control" type="text" ng-model="ngDialogData.user.name">
     </div>
     <div class="form-group">
-        <label>Email</label>
+        <label>{{$root.text.user.lab_email}}</label>
         <input type="mail" class="form-control" ng-model="ngDialogData.user.email">
     </div>
     <div class="form-group">
-        <label>Password</label>
+        <label>{{$root.text.user.lab_pwd}}</label>
         <input type="password" class="form-control" ng-model="ngDialogData.user.password">
     </div>
     <div class="form-group">
-        <label>Stato</label>
+        <label>{{$root.text.user.lab_stato}}</label>
         <select class="form-control" ng-model="ngDialogData.user.status" ng-options="option.key as option.value for option in ngDialogData.config.status.options"></select>
     </div>
     <div class="form-group">
-        <label>Gruppo</label>
+        <label>{{$root.text.user.lbl_gruppo}}</label>
         <select class="form-control" ng-model="ngDialogData.user.group.name" ng-options="option.key as option.value for option in ngDialogData.config.roles.options"></select>
     </div>
     
     <div class="form-group text-right">
-        <button class="btn btn-default" ng-click="closeThisDialog({})">Annulla</button>
-        <button class="btn btn-default" ng-click="closeThisDialog({callback:'editUser', data: ngDialogData.user})">Salva</button>
+        <button class="btn btn-default" ng-click="closeThisDialog({})">{{$root.text.user.btn_annulla}}</button>
+        <button class="btn btn-default" ng-click="closeThisDialog({callback:'editUser', data: ngDialogData.user})">{{$root.text.user.btn_salva}}</button>
     </div>
 </div>

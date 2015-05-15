@@ -5,5 +5,19 @@
 	"lbl_azione": "Azione",
 	"ttp_visualizza": "Visualizza",
 	"ttp_modifica": "Modifica",
-	"ttp_cancella": "Cancella"
+	"ttp_cancella": "Cancella",
+	"btn_nuovoutente1": "Nuovo",
+	"btn_nuovoutente2": "utente",
+	"btn_attivazione": "Invia link di attivazione",
+	"btn_reset": "Reset password",
+	"txt_removeuser": "Sei sicuro di rimuovere l'utente?",
+	"btn_no": "No",
+	"btn_si": "Si",
+	"lab_modificautente1": "Modifica",
+	"lab_modificautente2": "utente",
+	"lab_email": "Email",
+	"lab_pwd": "Password",
+	"lab_stato": "Stato",
+	"btn_annulla": "Annulla",
+	"btn_salva": "Salva"
 }

@@ -1,0 +1,38 @@
+.embedded-header {
+    background-color: rgba(20,20,20, 0.7);
+}
+
+.h1 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 0;
+    margin-top: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 5px;
+}
+
+.map-container {
+    top: 0;
+    bottom: 0px;
+    z-index: -10;
+    right: 0;
+}
+
+.map-container .panel-dx {
+    display: none;
+}
+
+.map-container .map-sx {
+    right: 0px;
+}
+
+.map-container .map-sx .panel-actions {
+    display: none;
+}
+
+.logo-geobi {
+    max-height: 40px;
+    margin: 5px;
+}

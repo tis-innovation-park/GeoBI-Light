@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html ng-app="geobi" lang="it">   <!-- lang passato da app -->
+    <head>
+        <base href="/" target="_blank">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/ng-dialog/0.3.2/css/ngDialog.min.css">
+        <link rel="shortcut icon" href="app/styles/img/favicon.ico" />
+
+
+        <!-- JS -->
+        <script src="//www.openlayers.org/api/OpenLayers.js"></script>
+        <script type="text/javascript" src="vendor/angular.min.js"></script>
+        <script type="text/javascript" src="vendor/angular-ui-router.min.js"></script>
+        <script type="text/javascript" src="app/styles/js/bootstrap-colorpicker-module.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/ng-dialog/0.3.2/js/ngDialog.min.js"></script>
+        <script type="text/javascript" src="app/app.js"></script>
+        
+        <!-- If IE -->
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/selectivizr/1.0.2/selectivizr-min.js"></script>
+        <![endif]-->
+        <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <![endif]-->
+        
+        <!-- Fonts -->
+        <link href='http://fonts.googleapis.com/css?family=Cabin:400,500,600,700' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="app/styles/css/font-awesome.min.css" type="text/css" />
+        
+        <!-- Style -->
+        <link rel="styleSheet" href ="app/styles/css/reset.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/bootstrap.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/geobi.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/colorpicker.css" type="text/css" />
+        <link rel="styleSheet" href ="app/styles/css/embedded.css" type="text/css" />
+    </head>
+    <body ng-controller="AppController as app">
+        <header class="row embedded-header">
+            <div class="col-xs-12">
+                <a id="link" href="" title="Vai al sito GeoBI"><img src="app/styles/img/logo_GeoBI_white.png" class="img-responsive logo-geobi" /></a>
+                <h1 id="title" class="h1"></h1>
+            </div>
+            
+        </header>
+        <div class="row" ui-view>
+        </div>
+        <script type="text/javascript" src="app/styles/js/bootstrap-without-jquery.js"></script>
+    </body>
+    <script>
+        var a = document.getElementById('link');
+        a.href = location.hash;
+        var hashList = JSON.parse(sessionStorage.getItem('hashList'));
+        var map = JSON.parse(sessionStorage.getItem(hashList[0]));
+        var h1 = document.getElementById('title');
+        h1.textContent = map.name;
+
+
+    </script>
+</html>

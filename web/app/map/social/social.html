@@ -1,7 +1,7 @@
 <h2><span class="ngdialog-span-title">{{$root.text.map.lab_condividilamappa1}}</span> {{$root.text.map.lab_condividilamappa2}}</h2>
 <ul class="nav nav-tabs">
     <li role="presentation"><label class="nav-tab-custom-label" for="share_label" ng-class="{active: socialTab == 1}">{{$root.text.map.tip_condividi}}</label></li>
-<!--     <li role="presentation"><label class="nav-tab-custom-label" for="code_label" ng-class="{active: socialTab == 2}">{{$root.text.map.tab_codicedaincorporare}}</label></li> -->
+    <li role="presentation"><label class="nav-tab-custom-label" for="code_label" ng-class="{active: socialTab == 2}">{{$root.text.map.tab_codicedaincorporare}}</label></li>
     <li role="presentation"><label class="nav-tab-custom-label" for="email_label" ng-class="{active: socialTab == 3}">{{$root.text.map.tab_email}}</label></li>
 </ul>
 <div class="tab-content" ng-init="socialTab = 1">
@@ -15,24 +15,32 @@
             <a target="blank" ng-href="https://plus.google.com/share?url={{social.url}}" class="btn btn-social-icon btn-google-plus"><i class="fa fa-google-plus"></i></a>
         </div>
     </div>
-<!--     <input type="radio" class="input-hidden tab-to-active" id="code_label" ng-model="socialTab" value="2">
+    <input type="radio" class="input-hidden tab-to-active" id="code_label" ng-model="socialTab" value="2">
     <div role="tabpanel" class="tab-pane fade in tab-active" id="code" aria-labelledby="code-tab">
-        <div class="form-horizontal">
-            <div class="form-group">
-                <label for="map-size" class="col-sm-4 control-label">{{$root.text.map.lab_dimensionemappa}}</label>
-                <div class="col-sm-8">
-                    <select class="form-control">
-                        <option>560x315 px</option>
-                    </select>
+        <div class="row col-xs-12">
+                <div class="form-inline">
+                    <div class="form-group">
+                        <label for="map-size" class="control-label">{{$root.text.map.lab_dimensionemappa}}</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" style="width: 100px" class="form-control" ng-model="social.iframe_width">
+                    </div>
+                    <div class="form-group">
+                        X
+                    </div>
+                    <div class="form-group">
+                        <input type="number" style="width: 100px" class="form-control" ng-model="social.iframe_height">
+                    </div>
                 </div>
-            </div>
+        </div>
+        <div class="row">
             <div class="form-group">
-                <div class="col-sm-12">
-                    <textarea class="form-control" rows="2"></textarea>
+                <div class="col-xs-12">
+                    <textarea class="form-control" rows="4" onclick="this.focus();this.select()" readonly="readonly" style="margin-top: 10px;"><iframe src="{{social.iframe_url}}" style="width: {{social.iframe_width}}px; height: {{social.iframe_height}}px;" frameborder="0"></iframe></textarea>
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
     <input type="radio" class="input-hidden tab-to-active" id="email_label" ng-model="socialTab" value="3">
     <div role="tabpanel" class="tab-pane fade in tab-active" id="email" aria-labelledby="email-tab">
         <div class="form-horizontal">

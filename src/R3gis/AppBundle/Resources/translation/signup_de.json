@@ -1,0 +1,9 @@
+{
+	"lab_paginaregistrazione": "Registrierungs-Seite",
+	"lab_nomecognome": "Name und Nachname",
+	"lab_email": "Email",
+	"lab_password": "Password",
+	"lab_repassword": "Bestätige Password",
+	"lab_captcha": "Captcha eingeben",
+	"btn_registrati": "Registrieren"
+}

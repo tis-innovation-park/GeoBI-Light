@@ -45,5 +45,20 @@
 	"lab_inviaa": "Senden an",
 	"but_invia": "Senden",
 	"box_mappadisfondo": "Hintergrundkartographie",
-	"lab_foglio": "Tabelle"	
+	"lab_foglio": "Tabelle",
+	"txt_aggiornamenti1": "Es gibt aktuellere Daten für diese Statistik,",
+	"lnk_aggiorna": "hier klicken",
+	"txt_aggiornamenti2": "um zu aktualisieren",
+	"btn_correggidati": "Korrigiere Daten",
+	"btn_annullamod": "Änderungen abbrechen",
+	"tooltip_name": "Name",
+	"tooltip_data": "Wert",
+	"lab_oggetto": "Objekt",
+	"txt_correggidati1": "Daten",
+	"txt_correggidati2": "korrigieren",
+	"txt_nonreversibile": "Achtung: die Änderung kann nicht rückgängig gemacht werden",
+	"lab_correzione": "Korrigierung",
+	"opt_selezionare": "-- Korrigierung auswählen --",
+	"txt_nodati": "Es gibt keine zu korrigierenden Daten",
+	"txt_statisticanonvalida": "Die Statistik ist nicht gültig"
 }

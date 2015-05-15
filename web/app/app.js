@@ -625,7 +625,11 @@
                                 }
                                 removeTooltip();
                                 addHighlightLayer(controller.currentHash, layer.order, res.result[j].id, t);
-                                var html = '<b>'+ layer.name +'</b><br />Name: '+ res.result[j].name +'<br />Data: '+ res.result[j].data +' '+ unit;
+                                var html = '<b>'+ layer.name +'</b><br />';
+                                if (res.result[j].name) {
+                                    html += $rootScope.text.map.tooltip_name +': '+ res.result[j].name +'<br />';
+                                }
+                                html += $rootScope.text.map.tooltip_data +': '+ res.result[j].data +' '+ unit;
                                 controller.popup = new OpenLayers.Popup("Stat info", position, new OpenLayers.Size(200,100), html, true, removeTooltip);
                                 map.addPopup(controller.popup);
                             }
@@ -1219,6 +1223,10 @@
         var controller = this;
 
         function init() {
+            var iframeTpl = '';
+            controller.iframe_url = $location.absUrl().replace('#', 'embedded/#');
+            controller.iframe_width = 800;
+            controller.iframe_height = 600;
             controller.url = $location.absUrl().replace('#', 'social');
             controller.body = 'Link: ' + controller.url;
         }
@@ -1232,8 +1240,6 @@
         controller.configUser = {};
 
         function init() {
-            var lang = storageFactory.load('currentLang');
-            
             apiFactory.getUserList().success(function(res) {
                 if(res.success) {
                     controller.data = res.result;
@@ -1242,7 +1248,7 @@
                 alert('Error:\n' + res.result.error.text);
                 console.log(res);
             });
-            controller.configUser = storageFactory.load('setting-' + lang + 'user').user;
+            console.log('load');
         }
 
         controller.deleteUser = function(id) {
@@ -1261,6 +1267,8 @@
         };
 
         controller.editUserDialog = function(i) {
+            var lang = storageFactory.load('currentLang');
+            controller.configUser = storageFactory.load('setting-' + lang + 'user').user;
             ngDialog.open({
                 template: 'app/users/editUser.html',
                 data: {
@@ -1680,6 +1688,7 @@
                         apiFactory.getSetting(lang, toState.name).success(function(res){
                             if (res.success) {
                                 storageFactory.save('setting-' + lang + toState.name, res.result.data);
+                                console.log('save');
                             }
                         }).error(function(res){
                             alert('Error:\n' + res.result.error.text);

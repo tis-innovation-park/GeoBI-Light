@@ -55,8 +55,8 @@
                             <li><a href="http://geobi.info/help">{% verbatim %}{{$root.text.app.mnu_tutorial}}{% endverbatim %}</a></li>
                             <li><a href="http://geobi.info/terms">{% verbatim %}{{$root.text.app.mnu_termini}}{% endverbatim %}</a></li>
 <!--                            <li><a href="#">{% verbatim %}{{$root.text.app.mnu_area}}{% endverbatim %}</a></li>-->
-                            <li><a ui-sref="signup" ng-hide="app.isAuth()">Registrati</a></li>
-                            <li><a ui-sref="user" ng-show="app.isAdmin()">Utenti</a></li>
+                            <li><a ui-sref="signup" ng-hide="app.isAuth()">{% verbatim %}{{$root.text.app.mnu_registrati}}{% endverbatim %}</a></li>
+                            <li><a ui-sref="user" ng-show="app.isAdmin()">{% verbatim %}{{$root.text.app.mnu_utenti}}{% endverbatim %}</a></li>
                             <li><p class="navbar-text" ng-show="app.isAuth()">{% verbatim %}{{app.user.name}}{% endverbatim %}</p></li>
                             <li class="toggle-hover-lang"><a href="#" class="dropdown-toggle">{% verbatim %}{{app.currentLang | uppercase}}{% endverbatim %}</a>
                                 <ul class="toggle-lang">

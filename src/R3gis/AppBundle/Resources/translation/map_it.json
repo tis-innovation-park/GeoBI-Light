@@ -45,5 +45,20 @@
 	"lab_inviaa": "Invia a",
 	"but_invia": "Invia",
 	"box_mappadisfondo": "Mappa di sfondo",
-	"lab_foglio": "Foglio"
+	"lab_foglio": "Foglio",
+	"txt_aggiornamenti1": "Sono presenti degli aggiornamenti per questa statistica,",
+	"lnk_aggiorna": "cliccare qui",
+	"txt_aggiornamenti2": "per aggiornare",
+	"btn_correggidati": "Correggi dati",
+	"btn_annullamod": "Annulla modifica",
+	"tooltip_name": "Nome",
+	"tooltip_data": "Dato",
+	"lab_oggetto": "Oggetto",
+	"txt_correggidati1": "Correggi",
+	"txt_correggidati2": "dati",
+	"txt_nonreversibile": "Attenzione: la modifica dei dati non è reversibile",
+	"lab_correzione": "correzione",
+	"opt_selezionare": "-- selezionare correzione --",
+	"txt_nodati": "Non ci sono dati da correggere",
+	"txt_statisticanonvalida": "La statistica non è valida"
 }

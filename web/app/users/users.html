@@ -12,7 +12,7 @@
             </div>
             <div class="col-sm-5 text-right">
                 <div class="form-group btn-group" ng-click="userlist.newUser()">
-                    <button ng-click="" class="btn btn-default btn-create">Nuovo <span>utente</span></button>
+                    <button ng-click="" class="btn btn-default btn-create">{{$root.text.user.btn_nuovoutente1}} <span>{{$root.text.user.btn_nuovoutente2}}</span></button>
                     <button ng-click="" class="btn btn-plus"><i class="fa fa-plus"></i></button>
                 </div>
             </div>
@@ -37,8 +37,8 @@
                                 <td>{{user.group.name}}</td>
                                 <td class="form-inline text-right">
                                     <div class="form-group">
-                                        <button type="button" class="btn btn-show btn-action-column" title="Invia link di attivazione" ng-show="user.status === 'W'" ng-click="userlist.sendActivationLink($index)"> <i class="fa fa-envelope" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
-                                        <button type="button" class="btn btn-action-column" title="Reset password" ng-hide="user.status === 'W'" ng-click="userlist.resetPassword($index)"> <i class="fa fa-key" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
+                                        <button type="button" class="btn btn-show btn-action-column" title="{{$root.text.user.btn_attivazione}}" ng-show="user.status === 'W'" ng-click="userlist.sendActivationLink($index)"> <i class="fa fa-envelope" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
+                                        <button type="button" class="btn btn-action-column" title="{{$root.text.user.btn_reset}}" ng-hide="user.status === 'W'" ng-click="userlist.resetPassword($index)"> <i class="fa fa-key" ng-hide="user.state === 'ok'"></i> <i ng-show="user.state === 'ok'" class="fa fa-check"></i></button>
                                     </div>
                                     <div class="form-group">
                                         <button type="button" class="btn btn-edit btn-action-column" title="{{$root.text.user.ttp_modifica}}" ng-click="userlist.editUserDialog($index)"> <i class="fa fa-pencil"></i></button>

@@ -1,6 +1,6 @@
 <section class="login" ng-controller="LoginController as login">
     <div class="row">
-        <h3><i class="fa fa-user"></i> Pagina di accesso</h3>
+        <h3><i class="fa fa-user"></i> {{$root.text.login.lab_paginaaccesso}}</h3>
     </div>
     <div class="row">
         <form class="form-horizontal" role="form" name="loginForm" novalidate>
@@ -17,10 +17,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <button class="btn btn-success btn-block" ng-click="login.login()" ng-disabled="!loginForm.$valid">Accedi</button>
+                <button class="btn btn-success btn-block" ng-click="login.login()" ng-disabled="!loginForm.$valid">{{$root.text.login.btn_accedi}}</button>
                 <p class="help-block">
-                    <a class="pull-right text-muted" ui-sref="passwordreset"><small>Hai dimenticato la password?</small></a><br>
-                    <a class="pull-right text-muted" ui-sref="signup"><small>Registrati</small></a>
+                    <a class="pull-right text-muted" ui-sref="passwordreset"><small>{{$root.text.login.lnk_dimenticatopassword}}</small></a><br>
+                    <a class="pull-right text-muted" ui-sref="signup"><small>{{$root.text.login.lnk_registrati}}</small></a>
                 </p>
             </div>
         </form>

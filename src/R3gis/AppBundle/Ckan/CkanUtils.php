@@ -194,6 +194,7 @@ final class CkanUtils {
                 continue;
             }
             $url = "{$this->baseUrl}api/3/action/package_show?id={$packageCode}";
+            //echo "[$url]\n";
             $json = $this->getJson($url, $ttl);
             if ($json['result']['state'] == 'active' && $json['result']['type'] == 'dataset') {
                 $res = array(

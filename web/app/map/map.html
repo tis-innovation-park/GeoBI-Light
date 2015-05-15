@@ -21,35 +21,33 @@
                         <div ng-repeat="layer in map.layers" ng-show="layer.active">
                             <h3>{{layer.name}}</h3>
                             <div class="form-horizontal">
-                                <div ng-repeat="legend in layer.options.legend" ng-hide="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
+                                <div ng-repeat="legend in layer.options.legend">
                                     <div ng-hide="$last">
-                                        <div class="form-group">
+                                        <div class="form-group" ng-hide="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
                                             <div class="col-xs-4">
                                                 <div class="color-legend" style="background-color: {{legend.color}};"></div>
                                             </div>
                                             <label class="col-xs-8"><i class="fa fa-minor-equal"></i> {{legend.number}} {{layer.options.unit}}</label>
                                         </div>
+                                        <div class="form-group" ng-show="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
+                                            <div class="col-xs-4" >
+                                                <div class="" style="border-radius: 50%; width:10px; height:10px; background-color: {{layer.options.nodataColor}};"></div>
+                                            </div>
+                                            <label class="col-xs-8">{{legend.number}} {{layer.options.unit}}</label>
+                                        </div>
                                     </div>
                                     <div ng-show="$last">
-                                        <div class="form-group">
+                                        <div class="form-group" ng-hide="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
                                             <div class="col-xs-4">
                                                 <div class="color-legend" style="background-color: {{legend.color}};"></div>
                                             </div>
                                             <label class="col-xs-8">{{$root.text.map.lab_oltre}}</label>
                                         </div>
-                                    </div>
-                                </div>
-                                <div ng-show="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
-                                    <div>
-                                        <div class="form-group">
-                                            <div class="col-xs-4" >
-                                                <div class="" style="border-radius: 50%; width:10px; height:10px; background-color: {{layer.options.nodataColor}};"></div>
-                                            </div>
-                                            <label class="col-xs-8">{{layer.options.minSize}}px</label>
-                                            <div class="col-xs-4" >
+                                        <div class="form-group" ng-show="(layer.options.sizeType == 'variable' && layer.options.layerType == 'point')">
+                                            <div class="col-xs-4">
                                                 <div class="color-legend" style="border-radius: 50%; width:20px; background-color: {{layer.options.nodataColor}};"></div>
                                             </div>
-                                            <label class="col-xs-8">{{layer.options.maxSize}}px</label>
+                                            <label class="col-xs-8">{{legend.number}} {{layer.options.unit}}</label>
                                         </div>
                                     </div>
                                 </div>
@@ -127,7 +125,7 @@
                                     <div class="form-horizontal">
                                         <div class="form-group">
                                             <div class="col-md-12" ng-show="map.update[layer.order]">
-                                                <div class="alert alert-warning" role="alert">Sono presenti degli aggiornamenti per questa statistica, <a ng-click="map.updateDataLayer(map.update[layer.order])" title="Aggiornare layer">cliccare qui</a> per aggiornare</div>
+                                                <div class="alert alert-warning" role="alert">{{$root.text.map.txt_aggiornamenti1}}, <a ng-click="map.updateDataLayer(map.update[layer.order])" title="Aggiornare layer">{{$root.text.map.lnk_aggiorna}}</a> {{$root.text.map.txt_aggiornamenti2}}</div>
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -241,7 +239,7 @@
                                         </div>
                                         <div class="form-group text-right">
                                             <div class="col-sm-12">
-                                                <button class="btn btn-default" ng-click="map.editDataLayer($index)" ng-show="map.data.isMine">Correggi dati</button>
+                                                <button class="btn btn-default" ng-click="map.editDataLayer($index)" ng-show="map.data.isMine">{{$root.text.map.btn_correggidati}}</button>
                                                 <button class="btn btn-default" ng-click="map.removeMapLayer($index)" ng-show="map.data.isMine">{{$root.text.map.but_rimuovi}}</button>
                                                 <!-- <button class="btn btn-default" ng-click="map.refreshMap()">{{$root.text.map.but_applica}}</button> -->
                                             </div>
@@ -253,11 +251,11 @@
                     </div>
                 </div>
                 <div class="form-group text-right">
-                    <button class="btn btn-default" ng-show="map.hasChanged()" ng-click="map.undoMap()" ng-disabled="!map.data.isMine">Annulla modifica</button>
-                    <button class="btn btn-default" ng-click="map.addLayerFromCkan()" ng-disabled="!map.data.isMine">{{$root.text.map.but_aggiungistatistica}}</button>
-                    <button class="btn btn-default" ng-class="{saved: map.data.state === 'saved'}" ng-click="map.saveMap()" ng-disabled="!map.data.isMine"><i ng-show="map.data.state === 'saved'" class="fa fa-check"></i><span>{{$root.text.map.but_salva}}</span></button>
+                    <button class="btn btn-default" ng-show="map.hasChanged()" ng-click="map.undoMap()" ng-hide="!map.data.isMine">{{$root.text.map.btn_annullamod}}</button>
+                    <button class="btn btn-default" ng-click="map.addLayerFromCkan()" ng-hide="!map.data.isMine">{{$root.text.map.but_aggiungistatistica}}</button>
+                    <button class="btn btn-default" ng-class="{saved: map.data.state === 'saved'}" ng-click="map.saveMap()" ng-hide="!map.data.isMine"><i ng-show="map.data.state === 'saved'" class="fa fa-check"></i><span>{{$root.text.map.but_salva}}</span></button>
                 </div>
-                <div class="form-inline">
+                <div class="form-inline" ng-hide="!map.data.isMine">
                     <label class="control-label">{{$root.text.map.lab_questamappae}}:</label>
                     <div class="form-group">
                         <label class="checkbox-inline">

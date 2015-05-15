@@ -186,6 +186,7 @@ class MapController extends Controller {
             'success' => true,
             'result' => $this->getMapInfo($hash)
         ));
+        //print_r($this->getMapInfo($hash)); die();
         return $response;
     }
 
@@ -555,7 +556,15 @@ class MapController extends Controller {
             }
 
             if ($mapInfo['is_shape']) {
-                $sql = "SELECT * FROM {$mapInfo['schema']}.{$mapInfo['table']} WHERE ST_intersects(the_geom, {$geom})";
+                if ($mapInfo['layer_type'] == 'point' && $buffer > 0) {
+                    $sql = "SELECT *, st_distance(ST_PointOnSurface(the_geom), {$geom}) AS distance_from_geometry
+                            FROM {$mapInfo['schema']}.{$mapInfo['table']} 
+                            WHERE st_distance(ST_PointOnSurface(the_geom), {$geom}) < {$buffer}
+                            ORDER BY distance_from_geometry ASC
+                            LIMIT 1";
+                } else {
+                    $sql = "SELECT * FROM {$mapInfo['schema']}.{$mapInfo['table']} WHERE ST_intersects(the_geom, {$geom})";
+                }
             } else {
                 $geoTableName = empty($mapInfo['area_type_code']) ? 'area' : "area_part_{$mapInfo['area_type_code']}";
                 $langQuoted = $db->quote($mapInfo['lang']);
@@ -577,6 +586,7 @@ class MapController extends Controller {
                 }
                 //$sql .= " ORDER BY ";
             }
+            //echo $sql;
             $result = array();
             foreach ($db->query($sql, \PDO::FETCH_ASSOC) as $row) {
                 $result[] = array(
@@ -680,23 +690,44 @@ class MapController extends Controller {
     
     // SS: Move to utility
     static public function getLegend($doctrine, MapLayer $mapLayer) {
+        $db = $doctrine->getManager()->getConnection();
+        
+        $layerTypeList = $db->query("SELECT lt_id, lt_code FROM geobi.layer_type")->fetchAll(\PDO::FETCH_KEY_PAIR);
+        
         $result = null;
-
-        $mapClasses = $doctrine
-                ->getRepository('R3gisAppBundle:MapClass')
-                ->findBy(array('mapLayer' => $mapLayer), array('order' => 'ASC'));
-        foreach ($mapClasses as $mapClass) {
-            $color = $mapClass->getColor();
-            $color = empty($color) ? null : "#{$color}";
-            $class = array(
-                'order' => $mapClass->getOrder(),
-                'name' => $mapClass->getName(),
-                'number' => $mapClass->getNumber(),
-                'text' => $mapClass->getText(),
-                'color' => $color,
-            );
-            $result[] = $class;
-        }
+        $defaults = array(
+            'order' => null, 
+            'name' => null,
+            'number' => null,
+            'text' => null,
+            'color' => null);
+        if ($layerTypeList[$mapLayer->getLayerTypeId()] == 'point' && $mapLayer->getSizeType() == 'variable') {
+            $schema = $mapLayer->getTableSchema();
+            $table = $mapLayer->getTableName();
+            $dataColumn = $mapLayer->getDataColumn();
+            $sql = "SELECT MIN({$dataColumn}) AS min_val, MAX({$dataColumn}) AS max_val FROM {$schema}.{$table}";
+            
+            $values = $db->query($sql)->fetch(\PDO::FETCH_ASSOC);
+            $result = array(
+                array('order'=>1, 'number'=>$values['min_val']), 
+                array('order'=>2, 'number'=>$values['max_val']));
+        } else {
+            $mapClasses = $doctrine
+                    ->getRepository('R3gisAppBundle:MapClass')
+                    ->findBy(array('mapLayer' => $mapLayer), array('order' => 'ASC'));
+            foreach ($mapClasses as $mapClass) {
+                $color = $mapClass->getColor();
+                $color = empty($color) ? null : "#{$color}";
+                $class = array(
+                    'order' => $mapClass->getOrder(),
+                    'name' => $mapClass->getName(),
+                    'number' => $mapClass->getNumber(),
+                    'text' => $mapClass->getText(),
+                    'color' => $color,
+                );
+                $result[] = $class;
+            }
+        }    
         return $result;
     }
 

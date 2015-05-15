@@ -23,4 +23,17 @@ class DefaultController extends Controller
         return $this->render('R3gisAppBundle:Default:index.html.twig', $params);
     }
     
+    
+    /**
+     * @Route("/embedded/", name="r3gis.app.embedded.index")
+     */
+    public function embeddedAction()
+    {
+        $params = array(
+            'baseUrl'=>$this->container->getParameter('base_url'),
+            'authorUrl'=>$this->container->getParameter('author_url'),
+            'srid'=>$this->container->getParameter('srid'));
+        return $this->render('R3gisAppBundle:Default:embedded.html.twig', $params);
+    }
+    
 }

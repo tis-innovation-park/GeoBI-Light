@@ -1,24 +1,24 @@
 <section class="login" ng-controller="ResetController as reset">
     <div class="row">
-        <h3><i class="fa fa-lock"></i> Recupera password</h3>
+        <h3><i class="fa fa-lock"></i> {{$root.text.reset.lab_recuperapwd}}</h3>
     </div>
     <div class="row">
         <form class="form-horizontal" role="form">
             <div class="form-group">
-                <div ng-show="reset.isValid" class="alert alert-warning no-margin" role="alert">La sessione scadrà alle {{reset.expired | date: 'HH:mm dd/MM/yyyy' }}</div>
-                <div ng-hide="reset.isValid" class="alert alert-danger no-margin" role="alert">La sessione non è valida</div>
+                <div ng-show="reset.isValid" class="alert alert-warning no-margin" role="alert">{{$root.text.reset.txt_sessionescadra}} {{reset.expired | date: 'HH:mm dd/MM/yyyy' }}</div>
+                <div ng-hide="reset.isValid" class="alert alert-danger no-margin" role="alert">{{$root.text.reset.txt_sessionescaduta}}</div>
             </div>
             <div class="form-group" ng-show="reset.isValid">
-                <label>Password</label>
-                <input type="password" class="form-control" placeholder="Inserire password" ng-model="reset.credential.password">
+                <label>{{$root.text.reset.lab_password}}</label>
+                <input type="password" class="form-control" placeholder="{{$root.text.reset.lab_password}}" ng-model="reset.credential.password">
             </div>
             <div class="form-group" ng-show="reset.isValid">
-                <label>Reinscerisci password</label>
-                <input type="password" class="form-control" placeholder="Reinserire password" ng-model="reset.credential.checkPassword">
+                <label>{{$root.text.reset.lab_repassword}}</label>
+                <input type="password" class="form-control" placeholder="{{$root.text.reset.lab_repassword}}" ng-model="reset.credential.checkPassword">
             </div>
             <div class="form-group">
-                <button class="btn btn-success btn-block" ng-show="reset.isValid" ng-click="reset.changePassword()">Invia</button>
-                <button class="btn btn-success btn-block" ng-hide="reset.isValid" ui-sref="homepage">Torna alla homepage</button>
+                <button class="btn btn-success btn-block" ng-show="reset.isValid" ng-click="reset.changePassword()">{{$root.text.reset.btn_invia}}</button>
+                <button class="btn btn-success btn-block" ng-hide="reset.isValid" ui-sref="homepage">{{$root.text.reset.btn_homepage}}</button>
             </div>
         </form>
     </div>

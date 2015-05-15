@@ -5,5 +5,19 @@
 	"lbl_azione": "Aktion",
 	"ttp_visualizza": "Anzeigen",
 	"ttp_modifica": "Ändern",
-	"ttp_cancella": "Löschen"
+	"ttp_cancella": "Löschen",
+	"btn_nuovoutente1": "Neuer",
+	"btn_nuovoutente2": "Benutzer",
+	"btn_attivazione": "Sende Aktivations-Link",
+	"btn_reset": "Password zurücksetzen",
+	"txt_removeuser": "Bist Du sicher dass du den Benutzer löschen willst?",
+	"btn_no": "Nein",
+	"btn_si": "Ja",
+	"lab_modificautente1": "Benutzer",
+	"lab_modificautente2": "ändern",
+	"lab_email": "Email",
+	"lab_pwd": "Password",
+	"lab_stato": "Status",
+	"btn_annulla": "Abbrechen",
+	"btn_salva": "Speichern"
 }

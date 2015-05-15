@@ -45,5 +45,20 @@
 	"lab_inviaa": "Send to",
 	"but_invia": "Send",
 	"box_mappadisfondo": "Background map",
-	"lab_foglio": "Sheet"
+	"lab_foglio": "Sheet",
+	"txt_aggiornamenti1": "There are updates available for this statistic,",
+	"lnk_aggiorna": "click here",
+	"txt_aggiornamenti2": "to update",
+	"btn_correggidati": "Correct data",
+	"btn_annullamod": "Undo changes",
+	"tooltip_name": "Name",
+	"tooltip_data": "Data",
+	"lab_oggetto": "Object",
+	"txt_correggidati1": "Correct",
+	"txt_correggidati2": "data",
+	"txt_nonreversibile": "Attention: the changes can not be undone",
+	"lab_correzione": "correction",
+	"opt_selezionare": "-- select correction --",
+	"txt_nodati": "There is no data to correct",
+	"txt_statisticanonvalida": "The statistic is not valid"
 }

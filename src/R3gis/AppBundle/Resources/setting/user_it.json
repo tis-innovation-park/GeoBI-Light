@@ -2,8 +2,8 @@
     "user": {
         "roles": {
             "options": [
-                { "key": "admin", "value": "Amministratore" },
-                { "key": "map_producer", "value": "Creatore di mappe" }
+                { "key": "ADMIN", "value": "Amministratore" },
+                { "key": "MAP_PRODUCER", "value": "Creatore di mappe" }
             ]
         },
         "status": {
