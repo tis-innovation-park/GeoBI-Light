@@ -144,7 +144,7 @@ class CkanController extends Controller {
             if ($addField) {
                 $result[$sheetId]['headers'][] = array('column' => $row['itd_column'],
                     'name' => $row['itd_name'],
-                    'spatial_data' => $row['itd_spatial_data'],
+                    'spatial_data' => !$row['it_is_shape'] && $row['itd_spatial_data'],
                     'numeric_data' => $row['itd_numeric_data']);
             }
         }
