@@ -775,6 +775,8 @@ class MapController extends Controller {
         $result = array();
         
         $em = $this->getDoctrine()->getManager();
+        $em->refresh($map);
+        
         $mapLayers = $this->getDoctrine()
                 ->getRepository('R3gisAppBundle:MapLayer')
                 ->findBy(array('map' => $map), array('order' => 'ASC'));
