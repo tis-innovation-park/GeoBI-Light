@@ -185,9 +185,9 @@ final class CkanUtils {
 
         $ttl = CkanUtils::CACHE_TTL;
 
-        if ($force) {
+        //if ($force) {
             $ttl = 0;
-        }
+        //}
         $result = array();
         foreach ($packages as $packageCode) {
             if (empty($packageCode)) {
